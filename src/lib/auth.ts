@@ -19,41 +19,51 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            console.log("[auth] Missing email or password");
+            return null;
+          }
+
+          const user = await db
+            .select()
+            .from(users)
+            .where(eq(users.email, credentials.email as string))
+            .limit(1);
+
+          if (!user || user.length === 0) {
+            console.log("[auth] User not found:", credentials.email);
+            return null;
+          }
+
+          const dbUser = user[0];
+
+          if (!dbUser.password) {
+            console.log("[auth] User has no password set:", dbUser.email);
+            return null;
+          }
+
+          const passwordMatch = await bcrypt.compare(
+            credentials.password as string,
+            dbUser.password,
+          );
+
+          if (!passwordMatch) {
+            console.log("[auth] Password mismatch for user:", dbUser.email);
+            return null;
+          }
+
+          console.log("[auth] Authentication successful for:", dbUser.email);
+          return {
+            id: dbUser.id,
+            email: dbUser.email,
+            name: dbUser.name,
+            image: dbUser.image,
+          };
+        } catch (error) {
+          console.error("[auth] Authorization error:", error);
           return null;
         }
-
-        const user = await db
-          .select()
-          .from(users)
-          .where(eq(users.email, credentials.email as string))
-          .limit(1);
-
-        if (!user || user.length === 0) {
-          return null;
-        }
-
-        const dbUser = user[0];
-
-        if (!dbUser.password) {
-          return null;
-        }
-
-        const passwordMatch = await bcrypt.compare(
-          credentials.password as string,
-          dbUser.password,
-        );
-
-        if (!passwordMatch) {
-          return null;
-        }
-
-        return {
-          id: dbUser.id,
-          email: dbUser.email,
-          name: dbUser.name,
-          image: dbUser.image,
-        };
       },
     }),
     GitHubProvider({
