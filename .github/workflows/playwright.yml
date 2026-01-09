@@ -26,6 +26,8 @@ jobs:
         run: npm i
       - name: Install playwright browsers
         run: npx playwright install --with-deps
+      - name: Debug Environment Variables
+        run: echo "DATABASE_URL=$DATABASE_URL, APP_URL=$APP_URL, GITHUB_ID=$GITHUB_ID, NEXTAUTH_SECRET=$NEXTAUTH_SECRET"
       - name: Run tests
         run: npm run e2e
       - uses: actions/upload-artifact@v4
