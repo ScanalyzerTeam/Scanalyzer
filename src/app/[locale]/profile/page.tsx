@@ -170,10 +170,11 @@ const ProfilePage = () => {
               <div className="space-y-6">
                 {/* Name Field */}
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                  <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700">
                     Full Name
                   </label>
                   <input
+                    id="name"
                     type="text"
                     value={formData.name}
                     onChange={(e) =>
@@ -190,10 +191,11 @@ const ProfilePage = () => {
 
                 {/* Email Field */}
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-700">
                     Email Address
                   </label>
                   <input
+                    id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) =>
@@ -210,10 +212,11 @@ const ProfilePage = () => {
 
                 {/* Job Title Field */}
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                  <label htmlFor="jobTitle" className="mb-2 block text-sm font-medium text-gray-700">
                     Job Title
                   </label>
                   <input
+                    id="jobTitle"
                     type="text"
                     value={formData.jobTitle}
                     onChange={(e) =>
@@ -230,10 +233,11 @@ const ProfilePage = () => {
 
                 {/* Location Field */}
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                  <label htmlFor="location" className="mb-2 block text-sm font-medium text-gray-700">
                     Location
                   </label>
                   <input
+                    id="location"
                     type="text"
                     value={formData.location}
                     onChange={(e) =>
