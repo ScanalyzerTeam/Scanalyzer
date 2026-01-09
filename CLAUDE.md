@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Scanalyzer is a Next.js 15 SaaS application with authentication, Stripe payments, i18n (English/Polish), and dark mode support. Built on the Skolaczk/next-starter template.
+Scanalyzer is a Next.js 15 SaaS application with authentication, i18n (English/Polish), and dark mode support. Built on the Skolaczk/next-starter template.
 
-**Stack:** Next.js 15 (App Router), React 19, TypeScript 5, Tailwind CSS 4, Drizzle ORM (PostgreSQL/Neon), NextAuth v5, Stripe, next-intl, shadcn/ui
+**Stack:** Next.js 15 (App Router), React 19, TypeScript 5, Tailwind CSS 4, Drizzle ORM (PostgreSQL/Neon), NextAuth v5, next-intl, shadcn/ui
 
 ## Commands
 
@@ -42,18 +42,13 @@ All routes are localized under `src/app/[locale]/`:
 ### API Routes
 - `api/auth/[...nextauth]/route.ts` - NextAuth handlers
 - `api/auth/signup/route.ts` - User registration endpoint
-- `api/stripe/webhook/route.ts` - Stripe subscription webhooks
 
 ### Key Files
 - `src/lib/auth.ts` - NextAuth config with Credentials + GitHub providers, JWT strategy
 - `src/lib/schema.ts` - Drizzle schema (users, accounts, sessions tables) + db client export
-- `src/lib/stripe.ts` - Stripe client instance
 - `src/env.mjs` - T3 Env validation for environment variables
 - `src/middleware.ts` - next-intl middleware for locale routing
 - `src/i18n/routing.ts` - Locale config (en, pl)
-
-### Server Actions
-- `src/actions/create-checkout-session.ts` - Creates Stripe subscription checkout
 
 ## Patterns
 
@@ -68,7 +63,7 @@ Add translations to both `/messages/en.json` and `/messages/pl.json`.
 
 ### Authentication
 - Check auth in server components/actions with `await auth()` from `@/lib/auth`
-- User session includes: `id`, `stripeCustomerId`, `isActive` fields
+- User session includes: `id` field
 - Protected routes check session existence
 
 ### Database
