@@ -170,7 +170,10 @@ const ProfilePage = () => {
               <div className="space-y-6">
                 {/* Name Field */}
                 <div>
-                  <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="name"
+                    className="mb-2 block text-sm font-medium text-gray-700"
+                  >
                     Full Name
                   </label>
                   <input
@@ -183,7 +186,7 @@ const ProfilePage = () => {
                     disabled={!isEditing}
                     className={`w-full rounded-lg border px-4 py-3 ${
                       isEditing
-                        ? "border-gray-300 bg-white focus:border-[#FFC107] focus:outline-none focus:ring-2 focus:ring-[#FFC107]/20"
+                        ? "border-gray-300 bg-white focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
                         : "border-gray-200 bg-gray-50 text-gray-600"
                     }`}
                   />
@@ -191,7 +194,10 @@ const ProfilePage = () => {
 
                 {/* Email Field */}
                 <div>
-                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="email"
+                    className="mb-2 block text-sm font-medium text-gray-700"
+                  >
                     Email Address
                   </label>
                   <input
@@ -204,7 +210,7 @@ const ProfilePage = () => {
                     disabled={!isEditing}
                     className={`w-full rounded-lg border px-4 py-3 ${
                       isEditing
-                        ? "border-gray-300 bg-white focus:border-[#FFC107] focus:outline-none focus:ring-2 focus:ring-[#FFC107]/20"
+                        ? "border-gray-300 bg-white focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
                         : "border-gray-200 bg-gray-50 text-gray-600"
                     }`}
                   />
@@ -212,7 +218,10 @@ const ProfilePage = () => {
 
                 {/* Job Title Field */}
                 <div>
-                  <label htmlFor="jobTitle" className="mb-2 block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="jobTitle"
+                    className="mb-2 block text-sm font-medium text-gray-700"
+                  >
                     Job Title
                   </label>
                   <input
@@ -225,7 +234,7 @@ const ProfilePage = () => {
                     disabled={!isEditing}
                     className={`w-full rounded-lg border px-4 py-3 ${
                       isEditing
-                        ? "border-gray-300 bg-white focus:border-[#FFC107] focus:outline-none focus:ring-2 focus:ring-[#FFC107]/20"
+                        ? "border-gray-300 bg-white focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
                         : "border-gray-200 bg-gray-50 text-gray-600"
                     }`}
                   />
@@ -233,7 +242,10 @@ const ProfilePage = () => {
 
                 {/* Location Field */}
                 <div>
-                  <label htmlFor="location" className="mb-2 block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="location"
+                    className="mb-2 block text-sm font-medium text-gray-700"
+                  >
                     Location
                   </label>
                   <input
@@ -246,7 +258,7 @@ const ProfilePage = () => {
                     disabled={!isEditing}
                     className={`w-full rounded-lg border px-4 py-3 ${
                       isEditing
-                        ? "border-gray-300 bg-white focus:border-[#FFC107] focus:outline-none focus:ring-2 focus:ring-[#FFC107]/20"
+                        ? "border-gray-300 bg-white focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
                         : "border-gray-200 bg-gray-50 text-gray-600"
                     }`}
                   />
