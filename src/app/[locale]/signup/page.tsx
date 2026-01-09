@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 
-const HomePage = () => {
+const SignUpPage = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [, setLoading] = useState(false);
   const router = useRouter();
@@ -15,9 +17,40 @@ const HomePage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      setError("Passwords don't match!");
+      return;
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
     setLoading(true);
 
     try {
+      // Create user
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Failed to create account");
+        setLoading(false);
+        return;
+      }
+
+      // Auto sign in after successful signup
       const result = await signIn("credentials", {
         email,
         password,
@@ -25,12 +58,12 @@ const HomePage = () => {
       });
 
       if (result?.error) {
-        setError("Invalid email or password");
+        setError("Account created but login failed. Please try signing in.");
         setLoading(false);
         return;
       }
 
-      // Redirect to dashboard on success
+      // Redirect to dashboard
       router.push("/dashboard");
     } catch {
       setError("An error occurred. Please try again.");
@@ -74,15 +107,17 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* Right Side - Login Form */}
+          {/* Right Side - Sign Up Form */}
           <div className="flex flex-col justify-center bg-[#f5f5f5] p-12 md:p-16">
             <div className="mx-auto w-full max-w-sm">
               {/* Header */}
               <div className="mb-8">
                 <h2 className="mb-2 text-3xl font-bold text-black">
-                  Welcome Back
+                  Create Account
                 </h2>
-                <p className="text-sm text-gray-600">Sign in to your account</p>
+                <p className="text-sm text-gray-600">
+                  Sign up for a new account
+                </p>
               </div>
 
               {/* Error Message */}
@@ -93,7 +128,26 @@ const HomePage = () => {
               )}
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Name Field */}
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="mb-2 block text-sm font-medium text-black"
+                  >
+                    Full Name
+                  </label>
+                  <input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="John Doe"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-black placeholder-gray-400 transition focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
+                    required
+                  />
+                </div>
+
                 {/* Email Field */}
                 <div>
                   <label
@@ -132,23 +186,42 @@ const HomePage = () => {
                   />
                 </div>
 
+                {/* Confirm Password Field */}
+                <div>
+                  <label
+                    htmlFor="confirmPassword"
+                    className="mb-2 block text-sm font-medium text-black"
+                  >
+                    Confirm Password
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-black placeholder-gray-400 transition focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
+                    required
+                  />
+                </div>
+
                 {/* Submit Button */}
                 <button
                   type="submit"
                   className="w-full rounded-lg bg-[#FFC107] px-4 py-3 font-semibold text-black transition hover:bg-[#FFB300] focus:ring-2 focus:ring-[#FFC107] focus:ring-offset-2 focus:outline-none"
                 >
-                  Sign In
+                  Sign Up
                 </button>
               </form>
 
-              {/* Sign Up Link */}
+              {/* Sign In Link */}
               <p className="mt-6 text-center text-sm text-gray-600">
-                Don&apos;t have an account?{" "}
+                Already have an account?{" "}
                 <Link
-                  href="/signup"
+                  href="/"
                   className="font-medium text-[#FFC107] transition hover:text-[#FFB300]"
                 >
-                  Sign up
+                  Sign in
                 </Link>
               </p>
             </div>
@@ -159,4 +232,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default SignUpPage;
