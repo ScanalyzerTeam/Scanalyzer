@@ -8,7 +8,6 @@ import GitHubProvider from "next-auth/providers/github";
 
 import { env } from "@/env.mjs";
 import { db, users } from "@/lib/schema";
-import { stripeServer } from "@/lib/stripe";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db) as Adapter,
@@ -54,8 +53,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           email: dbUser.email,
           name: dbUser.name,
           image: dbUser.image,
-          stripeCustomerId: dbUser.stripeCustomerId || "",
-          isActive: dbUser.isActive,
         };
       },
     }),
@@ -74,35 +71,14 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.stripeCustomerId = user.stripeCustomerId;
-        token.isActive = user.isActive;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.stripeCustomerId = token.stripeCustomerId as string;
-        session.user.isActive = token.isActive as boolean;
       }
       return session;
-    },
-  },
-  events: {
-    createUser: async ({ user }) => {
-      if (!user.email || !user.name) return;
-
-      await stripeServer.customers
-        .create({
-          email: user.email,
-          name: user.name,
-        })
-        .then(async (customer) =>
-          db
-            .update(users)
-            .set({ stripeCustomerId: customer.id })
-            .where(eq(users.id, user.id!)),
-        );
     },
   },
 });

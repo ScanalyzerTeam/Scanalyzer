@@ -22,8 +22,6 @@ export const users = pgTable("user", {
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
   password: text("password"),
-  stripeCustomerId: text("stripeCustomerId").unique(),
-  isActive: boolean("isActive").default(false).notNull(),
 });
 
 export const accounts = pgTable(
