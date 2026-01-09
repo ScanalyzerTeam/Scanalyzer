@@ -72,6 +72,15 @@ export default defineConfig({
   webServer: {
     command: "npm run dev",
     url: "http://127.0.0.1:3000",
+    timeout: 120000,
     reuseExistingServer: !process.env.CI,
+    env: {
+      DATABASE_URL: process.env.DATABASE_URL || "file:./test.db",
+      APP_URL: process.env.APP_URL || "http://127.0.0.1:3000",
+      GITHUB_ID: process.env.GITHUB_ID || "test-github-id",
+      GITHUB_SECRET: process.env.GITHUB_SECRET || "test-github-secret",
+      NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || "test-secret-key",
+      NODE_ENV: "test",
+    },
   },
 });
