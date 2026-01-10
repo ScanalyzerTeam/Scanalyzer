@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 
 import { LangSwitcher } from "@/components/lang-switcher";
+import { AuthSessionProvider } from "@/components/session-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { routing } from "@/i18n/routing";
@@ -61,13 +62,15 @@ const RootLayout = async ({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={cn("min-h-screen font-sans", fonts)}>
-        <NextIntlClientProvider>
-          <ThemeProvider attribute="class">
-            {children}
-            <LangSwitcher className="absolute right-5 bottom-16 z-10" />
-            <ThemeSwitcher className="absolute right-5 bottom-5 z-10" />
-          </ThemeProvider>
-        </NextIntlClientProvider>
+        <AuthSessionProvider>
+          <NextIntlClientProvider>
+            <ThemeProvider attribute="class">
+              {children}
+              <LangSwitcher className="absolute right-5 bottom-16 z-10" />
+              <ThemeSwitcher className="absolute right-5 bottom-5 z-10" />
+            </ThemeProvider>
+          </NextIntlClientProvider>
+        </AuthSessionProvider>
       </body>
     </html>
   );

@@ -101,6 +101,7 @@ const AIAssistantPage = () => {
     { icon: "📷", label: "Scanner", href: "/scanner" },
     { icon: "🏢", label: "Warehouse", href: "/warehouse" },
     { icon: "💬", label: "AI Assistant", href: "/ai-assistant" },
+    { icon: "👤", label: "Profile", href: "/profile" },
   ];
 
   return (
