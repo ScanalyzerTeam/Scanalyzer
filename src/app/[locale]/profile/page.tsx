@@ -1,21 +1,37 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const ProfilePage = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: session, status, update: updateSession } = useSession();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    jobTitle: "Warehouse Manager",
-    location: "District 5",
+    location: "",
+    image: "",
+  });
+
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
   useEffect(() => {
@@ -24,31 +40,145 @@ const ProfilePage = () => {
       if (status === "unauthenticated") {
         router.push("/");
       } else if (session?.user) {
-        setFormData((prev) => ({
-          ...prev,
-          name: session.user?.name || "",
-          email: session.user?.email || "",
-        }));
+        fetchProfile();
       }
     }
   }, [status, router, session]);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch("/api/profile");
+      if (response.ok) {
+        const data = await response.json();
+        setFormData({
+          name: data.name || "",
+          email: data.email || "",
+          location: data.location || "",
+          image: data.image || "",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to fetch profile:", error);
+    }
+  };
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
     router.push("/");
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // TODO: Add API call to save profile changes
+  const handleSave = async () => {
+    setIsSaving(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          location: formData.location,
+          image: formData.image,
+        }),
+      });
+
+      if (response.ok) {
+        setMessage({ type: "success", text: "Profile updated successfully!" });
+        setIsEditing(false);
+        await updateSession();
+      } else {
+        const data = await response.json();
+        setMessage({
+          type: "error",
+          text: data.error || "Failed to update profile",
+        });
+      }
+    } catch {
+      setMessage({ type: "error", text: "Failed to update profile" });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    setMessage(null);
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setMessage({ type: "error", text: "New passwords do not match" });
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      setMessage({
+        type: "error",
+        text: "Password must be at least 6 characters",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const response = await fetch("/api/profile/password", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        }),
+      });
+
+      if (response.ok) {
+        setMessage({ type: "success", text: "Password changed successfully!" });
+        setIsChangingPassword(false);
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      } else {
+        const data = await response.json();
+        setMessage({
+          type: "error",
+          text: data.error || "Failed to change password",
+        });
+      }
+    } catch {
+      setMessage({ type: "error", text: "Failed to change password" });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleAvatarClick = () => {
+    if (isEditing) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 1024 * 1024) {
+        setMessage({ type: "error", text: "Image must be less than 1MB" });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prev) => ({ ...prev, image: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const menuItems = [
-    { icon: "📊", label: "Dashboard", href: "/dashboard" },
-    { icon: "📷", label: "Scanner", href: "/scanner" },
-    { icon: "🏢", label: "Warehouse", href: "/warehouse" },
-    { icon: "💬", label: "AI Assistant", href: "/ai-assistant" },
-    { icon: "👤", label: "Profile", href: "/profile" },
+    { icon: "\ud83d\udcca", label: "Dashboard", href: "/dashboard" },
+    { icon: "\ud83d\udcf7", label: "Scanner", href: "/scanner" },
+    { icon: "\ud83c\udfe2", label: "Warehouse", href: "/warehouse" },
+    { icon: "\ud83d\udcac", label: "AI Assistant", href: "/ai-assistant" },
+    { icon: "\ud83d\udc64", label: "Profile", href: "/profile" },
   ];
 
   if (isLoading || !session?.user) {
@@ -134,6 +264,19 @@ const ProfilePage = () => {
           <p className="text-gray-600">Manage your personal information</p>
         </div>
 
+        {/* Message */}
+        {message && (
+          <div
+            className={`mb-6 rounded-lg p-4 ${
+              message.type === "success"
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Profile Form */}
           <div className="lg:col-span-2">
@@ -152,16 +295,20 @@ const ProfilePage = () => {
                 ) : (
                   <div className="flex gap-2">
                     <button
-                      onClick={() => setIsEditing(false)}
+                      onClick={() => {
+                        setIsEditing(false);
+                        fetchProfile();
+                      }}
                       className="rounded-lg border border-gray-200 px-4 py-2 font-medium text-gray-600 transition hover:bg-gray-50"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleSave}
-                      className="rounded-lg bg-[#FFC107] px-4 py-2 font-medium text-black transition hover:bg-[#FFB800]"
+                      disabled={isSaving}
+                      className="rounded-lg bg-[#FFC107] px-4 py-2 font-medium text-black transition hover:bg-[#FFB800] disabled:opacity-50"
                     >
-                      Save Changes
+                      {isSaving ? "Saving..." : "Save Changes"}
                     </button>
                   </div>
                 )}
@@ -216,30 +363,6 @@ const ProfilePage = () => {
                   />
                 </div>
 
-                {/* Job Title Field */}
-                <div>
-                  <label
-                    htmlFor="jobTitle"
-                    className="mb-2 block text-sm font-medium text-gray-700"
-                  >
-                    Job Title
-                  </label>
-                  <input
-                    id="jobTitle"
-                    type="text"
-                    value={formData.jobTitle}
-                    onChange={(e) =>
-                      setFormData({ ...formData, jobTitle: e.target.value })
-                    }
-                    disabled={!isEditing}
-                    className={`w-full rounded-lg border px-4 py-3 ${
-                      isEditing
-                        ? "border-gray-300 bg-white focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
-                        : "border-gray-200 bg-gray-50 text-gray-600"
-                    }`}
-                  />
-                </div>
-
                 {/* Location Field */}
                 <div>
                   <label
@@ -265,6 +388,113 @@ const ProfilePage = () => {
                 </div>
               </div>
             </div>
+
+            {/* Change Password Section */}
+            <div className="mt-6 rounded-xl bg-white p-8 shadow-sm">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-black">
+                  Change Password
+                </h2>
+                {!isChangingPassword && (
+                  <button
+                    onClick={() => setIsChangingPassword(true)}
+                    className="rounded-lg border border-gray-200 px-4 py-2 font-medium text-gray-600 transition hover:bg-gray-50"
+                  >
+                    Change Password
+                  </button>
+                )}
+              </div>
+
+              {isChangingPassword && (
+                <div className="space-y-6">
+                  <div>
+                    <label
+                      htmlFor="currentPassword"
+                      className="mb-2 block text-sm font-medium text-gray-700"
+                    >
+                      Current Password
+                    </label>
+                    <input
+                      id="currentPassword"
+                      type="password"
+                      value={passwordData.currentPassword}
+                      onChange={(e) =>
+                        setPasswordData({
+                          ...passwordData,
+                          currentPassword: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="newPassword"
+                      className="mb-2 block text-sm font-medium text-gray-700"
+                    >
+                      New Password
+                    </label>
+                    <input
+                      id="newPassword"
+                      type="password"
+                      value={passwordData.newPassword}
+                      onChange={(e) =>
+                        setPasswordData({
+                          ...passwordData,
+                          newPassword: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="confirmPassword"
+                      className="mb-2 block text-sm font-medium text-gray-700"
+                    >
+                      Confirm New Password
+                    </label>
+                    <input
+                      id="confirmPassword"
+                      type="password"
+                      value={passwordData.confirmPassword}
+                      onChange={(e) =>
+                        setPasswordData({
+                          ...passwordData,
+                          confirmPassword: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setIsChangingPassword(false);
+                        setPasswordData({
+                          currentPassword: "",
+                          newPassword: "",
+                          confirmPassword: "",
+                        });
+                      }}
+                      className="rounded-lg border border-gray-200 px-4 py-2 font-medium text-gray-600 transition hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handlePasswordChange}
+                      disabled={isSaving}
+                      className="rounded-lg bg-[#FFC107] px-4 py-2 font-medium text-black transition hover:bg-[#FFB800] disabled:opacity-50"
+                    >
+                      {isSaving ? "Updating..." : "Update Password"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Sidebar */}
@@ -272,19 +502,47 @@ const ProfilePage = () => {
             {/* Avatar Card */}
             <div className="rounded-xl bg-white p-6 shadow-sm">
               <div className="flex flex-col items-center">
-                <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gray-100">
-                  <svg
-                    className="h-12 w-12 text-gray-400"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                  </svg>
-                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <button
+                  onClick={handleAvatarClick}
+                  disabled={!isEditing}
+                  className={`mb-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-gray-100 ${
+                    isEditing
+                      ? "cursor-pointer ring-2 ring-[#FFC107] ring-offset-2"
+                      : ""
+                  }`}
+                >
+                  {formData.image ? (
+                    <img
+                      src={formData.image}
+                      alt="Avatar"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <svg
+                      className="h-12 w-12 text-gray-400"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                  )}
+                </button>
+                {isEditing && (
+                  <p className="mb-2 text-xs text-gray-500">
+                    Click to upload (max 1MB)
+                  </p>
+                )}
                 <h3 className="text-lg font-semibold text-black">
-                  {session.user.name}
+                  {formData.name || session.user.name}
                 </h3>
-                <p className="text-sm text-gray-600">{formData.jobTitle}</p>
+                <p className="text-sm text-gray-600">{formData.location}</p>
               </div>
             </div>
 
