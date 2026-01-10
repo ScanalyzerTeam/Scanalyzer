@@ -78,15 +78,31 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     signIn: "/",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+      }
+      // Refresh user data when session is updated
+      if (trigger === "update" && token.id) {
+        const dbUser = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, token.id as string))
+          .limit(1);
+        if (dbUser[0]) {
+          token.name = dbUser[0].name;
+          token.email = dbUser[0].email;
+        }
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
+        session.user.name = token.name as string;
+        session.user.email = token.email as string;
       }
       return session;
     },
