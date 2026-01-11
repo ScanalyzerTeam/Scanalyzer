@@ -56,7 +56,12 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const { name, email, location, image } = body;
 
-    console.log("[profile] PUT - body:", { name, email, location, image: image ? "[image data]" : null });
+    console.log("[profile] PUT - body:", {
+      name,
+      email,
+      location,
+      image: image ? "[image data]" : null,
+    });
 
     const updateData: {
       name?: string;
@@ -70,7 +75,10 @@ export async function PUT(request: Request) {
     if (location !== undefined) updateData.location = location;
     if (image !== undefined) updateData.image = image;
 
-    console.log("[profile] PUT - updateData:", { ...updateData, image: updateData.image ? "[image data]" : null });
+    console.log("[profile] PUT - updateData:", {
+      ...updateData,
+      image: updateData.image ? "[image data]" : null,
+    });
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
