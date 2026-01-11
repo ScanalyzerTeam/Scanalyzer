@@ -50,6 +50,7 @@ const ProfilePage = () => {
       const response = await fetch("/api/profile");
       if (response.ok) {
         const data = await response.json();
+        console.log("[profile] fetchProfile data:", data);
         setFormData({
           name: data.name || "",
           email: data.email || "",
@@ -87,6 +88,7 @@ const ProfilePage = () => {
         setMessage({ type: "success", text: "Profile updated successfully!" });
         setIsEditing(false);
         await updateSession();
+        await fetchProfile(); // Re-fetch to get latest data
       } else {
         const data = await response.json();
         setMessage({
@@ -326,6 +328,7 @@ const ProfilePage = () => {
                   <input
                     id="name"
                     type="text"
+                    value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
