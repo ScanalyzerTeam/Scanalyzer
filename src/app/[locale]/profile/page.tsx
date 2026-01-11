@@ -542,7 +542,8 @@ const ProfilePage = () => {
                 <h3 className="text-lg font-semibold text-black">
                   {formData.name || session.user.name}
                 </h3>
-                <p className="text-sm text-gray-600">{formData.location}</p>
+                <p className="text-sm text-blue-600">{formData.email}</p>
+                <p className="text-sm text-amber-600">{formData.location}</p>
               </div>
             </div>
 
