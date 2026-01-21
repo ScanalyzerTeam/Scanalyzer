@@ -351,7 +351,7 @@ const WarehousePage = () => {
 
           {/* Selected Zone Details Panel */}
           {selectedWarehouse && (
-            <div className="w-80 border-l border-gray-200 bg-white p-6">
+            <div className="flex w-80 flex-col border-l border-gray-200 bg-white p-6">
               <div className="mb-6 flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-black">
                   Zone Details
@@ -427,23 +427,26 @@ const WarehousePage = () => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="space-y-3">
-                <Link href={`/warehouse/${selectedWarehouse.id}`}>
-                  <Button className="w-full">
-                    <MapPin className="mr-2 h-4 w-4" />
-                    Open Map View
-                  </Button>
-                </Link>
-                <Button
-                  variant="outline"
-                  className="w-full text-red-600 hover:bg-red-50 hover:text-red-700"
-                  onClick={handleDeleteZone}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Zone
+              {/* Open Map Button */}
+              <Link href={`/warehouse/${selectedWarehouse.id}`}>
+                <Button className="w-full">
+                  <MapPin className="mr-2 h-4 w-4" />
+                  Open Map View
                 </Button>
-              </div>
+              </Link>
+
+              {/* Spacer to push delete button to bottom */}
+              <div className="flex-1" />
+
+              {/* Delete Button at bottom */}
+              <Button
+                variant="outline"
+                className="mt-6 w-full text-red-600 hover:bg-red-50 hover:text-red-700"
+                onClick={handleDeleteZone}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Zone
+              </Button>
             </div>
           )}
         </div>
