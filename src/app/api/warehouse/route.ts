@@ -1,12 +1,12 @@
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
-import { db, shelves, warehouses } from "@/lib/schema";
+import { db, items, shelves, warehouses } from "@/lib/schema";
 
 const MAX_WAREHOUSES_PER_USER = 3;
 
-// GET - List all warehouses for the current user
+// GET - List all warehouses for the current user with shelf and item counts
 export async function GET() {
   try {
     const session = await auth();
@@ -19,7 +19,29 @@ export async function GET() {
       .from(warehouses)
       .where(eq(warehouses.userId, session.user.id));
 
-    return NextResponse.json(userWarehouses);
+    // Get shelf counts and item counts for each warehouse
+    const warehousesWithCounts = await Promise.all(
+      userWarehouses.map(async (warehouse) => {
+        const [shelfCountResult] = await db
+          .select({ count: count() })
+          .from(shelves)
+          .where(eq(shelves.warehouseId, warehouse.id));
+
+        const [itemCountResult] = await db
+          .select({ count: count() })
+          .from(items)
+          .innerJoin(shelves, eq(items.shelfId, shelves.id))
+          .where(eq(shelves.warehouseId, warehouse.id));
+
+        return {
+          ...warehouse,
+          shelfCount: shelfCountResult?.count || 0,
+          itemCount: itemCountResult?.count || 0,
+        };
+      }),
+    );
+
+    return NextResponse.json(warehousesWithCounts);
   } catch (error) {
     console.error("Error fetching warehouses:", error);
     return NextResponse.json(

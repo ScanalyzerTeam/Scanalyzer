@@ -38,15 +38,34 @@ export function SelectionTransformer({
     const scaleX = node.scaleX();
     const scaleY = node.scaleY();
 
-    // Reset scale and apply to width/height
+    // Reset scale
     node.scaleX(1);
     node.scaleY(1);
+
+    // For Groups, get dimensions from the client rect or children
+    let width = node.width();
+    let height = node.height();
+
+    // If node is a Group, get dimensions from its bounding box
+    if (node.getClassName() === "Group") {
+      const clientRect = node.getClientRect({ skipTransform: true });
+      width = clientRect.width;
+      height = clientRect.height;
+    }
+
+    // Apply scale to dimensions
+    width = Math.round(width * scaleX);
+    height = Math.round(height * scaleY);
+
+    // Guard against zero dimensions
+    if (width < 30) width = 100;
+    if (height < 30) height = 50;
 
     onTransformEnd({
       x: Math.round(node.x()),
       y: Math.round(node.y()),
-      width: Math.round(node.width() * scaleX),
-      height: Math.round(node.height() * scaleY),
+      width,
+      height,
       rotation: Math.round(node.rotation()),
     });
   };
