@@ -3,13 +3,53 @@ name: Discord Notifications
 on:
   push:
     branches: [ main ]
+  pull_request:
+    types: [opened, closed, reopened]
 
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Discord message
+      - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
+          EVENT="${{ github.event_name }}"
+
+          if [ "$EVENT" = "push" ]; then
+            COMMITS=$(jq -r '.commits[] | "- \(.author.name): \(.message) ([view](\(.url)))"' "$GITHUB_EVENT_PATH")
+            PAYLOAD=$(jq -n \
+              --arg repo "${{ github.repository }}" \
+              --arg actor "${{ github.actor }}" \
+              --arg commits "$COMMITS" \
+              '{
+                content: "🚀 New push to '"$repo"' by '"$actor"'**\n\n📝 **Commits:**\n'"$commits"'"
+              }')
+
+          elif [ "$EVENT" = "pull_request" ]; then
+            ACTION="${{ github.event.action }}"
+            TITLE=$(jq -r '.pull_request.title' "$GITHUB_EVENT_PATH")
+            URL=$(jq -r '.pull_request.html_url' "$GITHUB_EVENT_PATH")
+            AUTHOR=$(jq -r '.pull_request.user.login' "$GITHUB_EVENT_PATH")
+            MERGED=$(jq -r '.pull_request.merged' "$GITHUB_EVENT_PATH")
+
+            if [ "$ACTION" = "closed" ] && [ "$MERGED" = "true" ]; then
+              STATUS="✅ merged"
+            else
+              STATUS="📌 $ACTION"
+            fi
+
+            PAYLOAD=$(jq -n \
+              --arg repo "${{ github.repository }}" \
+              --arg title "$TITLE" \
+              --arg url "$URL" \
+              --arg author "$AUTHOR" \
+              --arg status "$STATUS" \
+              '{
+                content: "🔀 **Pull Request '"$status"' in '"$repo"'**\n\n📄 '"$title"'**\n👤 '"$author"'\n🔗 '"$url"'"
+              }')
+          fi
+
           curl -H "Content-Type: application/json" \
-          -d "{\"content\":\"🚀 New push to ${GITHUB_REPOSITORY} by **${GITHUB_ACTOR}**\"}" \
-          ${{ secrets.DISCORD_WEBHOOK }}
+               -d "$PAYLOAD" \
+               "$DISCORD_WEBHOOK"
