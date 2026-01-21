@@ -333,7 +333,7 @@ const ProfilePage = () => {
                     disabled={!isEditing}
                     className={`w-full rounded-lg border px-4 py-3 ${
                       isEditing
-                        ? "border-gray-300 bg-white focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
+                        ? "border-gray-300 bg-white text-gray-900 focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
                         : "border-gray-200 bg-gray-50 text-gray-600"
                     }`}
                   />
@@ -357,7 +357,7 @@ const ProfilePage = () => {
                     disabled={!isEditing}
                     className={`w-full rounded-lg border px-4 py-3 ${
                       isEditing
-                        ? "border-gray-300 bg-white focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
+                        ? "border-gray-300 bg-white text-gray-900 focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
                         : "border-gray-200 bg-gray-50 text-gray-600"
                     }`}
                   />
@@ -381,7 +381,7 @@ const ProfilePage = () => {
                     disabled={!isEditing}
                     className={`w-full rounded-lg border px-4 py-3 ${
                       isEditing
-                        ? "border-gray-300 bg-white focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
+                        ? "border-gray-300 bg-white text-gray-900 focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
                         : "border-gray-200 bg-gray-50 text-gray-600"
                     }`}
                   />
@@ -398,7 +398,7 @@ const ProfilePage = () => {
                 {!isChangingPassword && (
                   <button
                     onClick={() => setIsChangingPassword(true)}
-                    className="rounded-lg border border-gray-200 px-4 py-2 font-medium text-gray-600 transition hover:bg-gray-50"
+                    className="rounded-lg bg-[#FFC107] px-4 py-2 font-medium text-black transition hover:bg-[#FFB800]"
                   >
                     Change Password
                   </button>
@@ -424,7 +424,7 @@ const ProfilePage = () => {
                           currentPassword: e.target.value,
                         })
                       }
-                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
                     />
                   </div>
 
@@ -445,7 +445,7 @@ const ProfilePage = () => {
                           newPassword: e.target.value,
                         })
                       }
-                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
                     />
                   </div>
 
@@ -466,7 +466,7 @@ const ProfilePage = () => {
                           confirmPassword: e.target.value,
                         })
                       }
-                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
                     />
                   </div>
 
@@ -543,7 +543,7 @@ const ProfilePage = () => {
                   {formData.name || session.user.name}
                 </h3>
                 <p className="text-sm text-blue-600">{formData.email}</p>
-                <p className="text-sm text-amber-600">{formData.location}</p>
+                <p className="text-sm text-black">{formData.location}</p>
               </div>
             </div>
 
