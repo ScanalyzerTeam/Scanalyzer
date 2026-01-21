@@ -28,7 +28,7 @@ export function WarehouseToolbar({
   onRotateRight,
 }: WarehouseToolbarProps) {
   return (
-    <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white p-2 shadow-sm">
+    <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white p-2 text-gray-900 shadow-sm">
       <Button variant="outline" size="sm" onClick={onZoomIn} title="Zoom In">
         <Plus className="h-4 w-4" />
       </Button>
@@ -53,7 +53,7 @@ export function WarehouseToolbar({
       </Button>
       {selectedShelfId && (
         <>
-          <div className="mx-2 h-6 w-px bg-gray-200" />
+          <div className="mx-2 h-6 w-px bg-gray-200 text-gray-800" />
           <Button
             variant="outline"
             size="sm"
@@ -75,7 +75,7 @@ export function WarehouseToolbar({
               variant="outline"
               size="sm"
               onClick={onDeleteShelf}
-              className="text-red-600 hover:bg-red-50 hover:text-red-700"
+              className="text-red-600 hover:bg-red-100 hover:text-red-700"
               title="Delete Selected Shelf"
             >
               Delete
