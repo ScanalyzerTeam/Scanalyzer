@@ -7,6 +7,7 @@ import {
   MapPin,
   Package,
   Plus,
+  Trash2,
   Warehouse as WarehouseIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -84,6 +85,32 @@ const WarehousePage = () => {
       router.push(`/warehouse/${newWarehouse.id}`);
     },
   });
+
+  // Delete warehouse mutation
+  const deleteWarehouse = useMutation({
+    mutationFn: async (warehouseId: string) => {
+      const res = await fetch(`/api/warehouse?id=${warehouseId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete warehouse");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["warehouses"] });
+      setSelectedZoneId(null);
+    },
+  });
+
+  const handleDeleteZone = () => {
+    if (
+      selectedZoneId &&
+      confirm(
+        "Are you sure you want to delete this zone? All shelves and items will be permanently deleted.",
+      )
+    ) {
+      deleteWarehouse.mutate(selectedZoneId);
+    }
+  };
 
   const handleCreateZone = (e: React.FormEvent) => {
     e.preventDefault();
@@ -400,13 +427,23 @@ const WarehousePage = () => {
                 </div>
               </div>
 
-              {/* Open Map Button */}
-              <Link href={`/warehouse/${selectedWarehouse.id}`}>
-                <Button className="w-full">
-                  <MapPin className="mr-2 h-4 w-4" />
-                  Open Map View
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <Link href={`/warehouse/${selectedWarehouse.id}`}>
+                  <Button className="w-full">
+                    <MapPin className="mr-2 h-4 w-4" />
+                    Open Map View
+                  </Button>
+                </Link>
+                <Button
+                  variant="outline"
+                  className="w-full text-red-600 hover:bg-red-50 hover:text-red-700"
+                  onClick={handleDeleteZone}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Zone
                 </Button>
-              </Link>
+              </div>
             </div>
           )}
         </div>
