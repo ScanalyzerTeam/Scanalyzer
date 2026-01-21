@@ -1,14 +1,45 @@
 "use client";
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  Box,
+  ChevronRight,
+  MapPin,
+  Package,
+  Plus,
+  Warehouse as WarehouseIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
 
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import type { Warehouse } from "@/lib/warehouse/types";
+
+interface WarehouseWithStats extends Warehouse {
+  shelfCount: number;
+  itemCount: number;
+}
+
 const WarehousePage = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const [selectedZone, setSelectedZone] = useState("A");
+  const queryClient = useQueryClient();
+
+  // UI state
+  const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
+  const [showCreateZone, setShowCreateZone] = useState(false);
+  const [newZoneName, setNewZoneName] = useState("");
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
@@ -23,16 +54,56 @@ const WarehousePage = () => {
     { icon: "👤", label: "Profile", href: "/profile" },
   ];
 
-  const zones = [
-    { name: "Zone A", items: 342, capacity: 85, color: "bg-[#FFC107]" },
-    { name: "Zone B", items: 218, capacity: 54, color: "bg-gray-200" },
-    { name: "Zone C", items: 156, capacity: 39, color: "bg-gray-200" },
-    { name: "Zone D", items: 412, capacity: 73, color: "bg-gray-200" },
-    { name: "Zone E", items: 298, capacity: 61, color: "bg-gray-200" },
-    { name: "Zone F", items: 521, capacity: 92, color: "bg-gray-200" },
-  ];
+  // Fetch all warehouses with stats
+  const { data: warehouses = [], isLoading } = useQuery<WarehouseWithStats[]>({
+    queryKey: ["warehouses"],
+    queryFn: async () => {
+      const res = await fetch("/api/warehouse");
+      if (!res.ok) throw new Error("Failed to fetch warehouses");
+      return res.json();
+    },
+    refetchInterval: 5000,
+  });
 
-  const selectedZoneData = zones.find((z) => z.name === `Zone ${selectedZone}`);
+  // Create warehouse mutation
+  const createWarehouse = useMutation({
+    mutationFn: async (name: string) => {
+      const res = await fetch("/api/warehouse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      if (!res.ok) throw new Error("Failed to create warehouse");
+      return res.json();
+    },
+    onSuccess: (newWarehouse) => {
+      queryClient.invalidateQueries({ queryKey: ["warehouses"] });
+      setShowCreateZone(false);
+      setNewZoneName("");
+      // Navigate to the new warehouse map
+      router.push(`/warehouse/${newWarehouse.id}`);
+    },
+  });
+
+  const handleCreateZone = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newZoneName.trim()) {
+      createWarehouse.mutate(newZoneName.trim());
+    }
+  };
+
+  // Get zone letter for a warehouse based on its index
+  const getZoneLetter = (index: number) => String.fromCharCode(65 + index);
+
+  // Get the selected warehouse details
+  const selectedWarehouse = warehouses.find((w) => w.id === selectedZoneId);
+
+  // Calculate total stats
+  const totalShelves = warehouses.reduce(
+    (sum, w) => sum + (w.shelfCount || 0),
+    0,
+  );
+  const totalItems = warehouses.reduce((sum, w) => sum + (w.itemCount || 0), 0);
 
   return (
     <div className="flex min-h-screen bg-[#1a1d2e]">
@@ -102,150 +173,278 @@ const WarehousePage = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 bg-[#f5f5f5] p-8">
+      <main className="flex flex-1 flex-col bg-[#f5f5f5]">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-black">
-            Virtual Warehouse
-          </h1>
-          <p className="text-gray-600">
-            Interactive 3D floor plan and zone management
-          </p>
+        <div className="border-b border-gray-200 bg-white p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-black">Warehouse Zones</h1>
+              <p className="text-gray-600">
+                Manage your warehouse zones and inventory
+              </p>
+            </div>
+
+            {/* Stats */}
+            <div className="flex items-center gap-6">
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Total Zones</p>
+                <p className="text-xl font-bold text-black">
+                  {warehouses.length}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Total Shelves</p>
+                <p className="text-xl font-bold text-black">{totalShelves}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Total Items</p>
+                <p className="text-xl font-bold text-black">{totalItems}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Zones Grid */}
-          <div className="lg:col-span-2">
-            <div className="rounded-xl bg-white p-6 shadow-sm">
-              {/* Toolbar */}
-              <div className="mb-6 flex items-center gap-4">
-                <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
-                  <svg
-                    className="h-4 w-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="m21 21-4.35-4.35" />
-                  </svg>
-                  Zoom In
-                </button>
-                <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
-                  <svg
-                    className="h-4 w-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="m21 21-4.35-4.35" />
-                    <line x1="8" y1="11" x2="14" y2="11" />
-                  </svg>
-                  Zoom Out
-                </button>
-                <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
-                  <svg
-                    className="h-4 w-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <path d="M3 9h18" />
-                    <path d="M9 21V9" />
-                  </svg>
-                  3D View
-                </button>
+        {/* Content Area */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Zone Grid */}
+          <div className="flex-1 overflow-auto p-6">
+            {isLoading ? (
+              <div className="flex h-full items-center justify-center">
+                <div className="animate-pulse text-gray-500">
+                  Loading zones...
+                </div>
               </div>
-
-              {/* Zones */}
-              <div className="grid grid-cols-3 gap-4">
-                {zones.map((zone) => (
-                  <button
-                    key={zone.name}
-                    onClick={() => setSelectedZone(zone.name.split(" ")[1])}
-                    className={`rounded-xl p-6 text-left transition hover:shadow-md ${
-                      zone.name === `Zone ${selectedZone}`
-                        ? zone.color
-                        : "bg-gray-100"
+            ) : warehouses.length === 0 ? (
+              <div className="flex h-full flex-col items-center justify-center">
+                <WarehouseIcon className="mb-4 h-16 w-16 text-gray-300" />
+                <h3 className="mb-2 text-xl font-semibold text-gray-700">
+                  No zones yet
+                </h3>
+                <p className="mb-6 text-gray-500">
+                  Create your first warehouse zone to get started
+                </p>
+                <Button onClick={() => setShowCreateZone(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Zone
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {/* Warehouse Zone Cards */}
+                {warehouses.map((warehouse, index) => (
+                  <div
+                    key={warehouse.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setSelectedZoneId(warehouse.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedZoneId(warehouse.id);
+                      }
+                    }}
+                    className={`cursor-pointer rounded-xl bg-white p-6 shadow-sm transition hover:shadow-md ${
+                      selectedZoneId === warehouse.id
+                        ? "ring-2 ring-[#FFC107]"
+                        : ""
                     }`}
                   >
-                    <div className="mb-2 text-lg font-bold text-black">
-                      {zone.name}
+                    <div className="mb-4 flex items-start justify-between">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#FFF9E6]">
+                        <span className="text-xl font-bold text-[#FFC107]">
+                          {getZoneLetter(index)}
+                        </span>
+                      </div>
+                      <Link
+                        href={`/warehouse/${warehouse.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+                      >
+                        <ChevronRight className="h-5 w-5" />
+                      </Link>
                     </div>
-                    <div className="mb-1 text-2xl font-bold text-black">
-                      {zone.items} items
+
+                    <h3 className="mb-1 text-lg font-semibold text-black">
+                      {warehouse.name}
+                    </h3>
+                    <p className="mb-4 text-sm text-gray-500">
+                      Zone {getZoneLetter(index)}
+                    </p>
+
+                    <div className="flex items-center gap-4 text-sm">
+                      <div className="flex items-center gap-1.5 text-gray-600">
+                        <Box className="h-4 w-4" />
+                        <span>{warehouse.shelfCount || 0} shelves</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-gray-600">
+                        <Package className="h-4 w-4" />
+                        <span>{warehouse.itemCount || 0} items</span>
+                      </div>
                     </div>
-                    <div className="text-sm text-black/70">
-                      {zone.capacity}% capacity
+
+                    {/* Capacity indicator */}
+                    <div className="mt-4">
+                      <div className="mb-1 flex items-center justify-between text-xs">
+                        <span className="text-gray-500">Capacity</span>
+                        <span className="font-medium text-gray-700">
+                          {Math.min(
+                            100,
+                            Math.round(
+                              ((warehouse.shelfCount || 0) / 10) * 100,
+                            ),
+                          )}
+                          %
+                        </span>
+                      </div>
+                      <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+                        <div
+                          className="h-full rounded-full bg-[#FFC107] transition-all"
+                          style={{
+                            width: `${Math.min(100, Math.round(((warehouse.shelfCount || 0) / 10) * 100))}%`,
+                          }}
+                        />
+                      </div>
                     </div>
-                  </button>
+                  </div>
                 ))}
+
+                {/* Add Zone Card */}
+                {warehouses.length < 6 && (
+                  <button
+                    onClick={() => setShowCreateZone(true)}
+                    className="flex min-h-[200px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-white p-6 text-gray-400 transition hover:border-[#FFC107] hover:text-[#FFC107]"
+                  >
+                    <Plus className="mb-2 h-8 w-8" />
+                    <span className="font-medium">Add Zone</span>
+                  </button>
+                )}
               </div>
-            </div>
+            )}
           </div>
 
-          {/* Zone Details */}
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-            <h3 className="mb-4 text-lg font-bold text-black">
-              Zone {selectedZone} - Selected
-            </h3>
+          {/* Selected Zone Details Panel */}
+          {selectedWarehouse && (
+            <div className="w-80 border-l border-gray-200 bg-white p-6">
+              <div className="mb-6 flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-black">
+                  Zone Details
+                </h3>
+                <button
+                  onClick={() => setSelectedZoneId(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
 
-            <div className="space-y-4">
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Capacity</span>
-                  <span className="text-sm font-semibold text-black">
-                    {selectedZoneData?.capacity}%
+              <div className="mb-6">
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-[#FFF9E6]">
+                  <span className="text-2xl font-bold text-[#FFC107]">
+                    {getZoneLetter(
+                      warehouses.findIndex(
+                        (w) => w.id === selectedWarehouse.id,
+                      ),
+                    )}
                   </span>
                 </div>
-                <div className="h-2 w-full rounded-full bg-gray-200">
-                  <div
-                    className="h-2 rounded-full bg-[#FFC107]"
-                    style={{ width: `${selectedZoneData?.capacity}%` }}
-                  />
+                <h4 className="text-xl font-bold text-black">
+                  {selectedWarehouse.name}
+                </h4>
+                <p className="text-sm text-gray-500">
+                  Zone{" "}
+                  {getZoneLetter(
+                    warehouses.findIndex((w) => w.id === selectedWarehouse.id),
+                  )}
+                </p>
+              </div>
+
+              {/* Zone Stats */}
+              <div className="mb-6 space-y-4">
+                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                  <div className="flex items-center gap-2">
+                    <Box className="h-5 w-5 text-gray-400" />
+                    <span className="text-sm text-gray-600">Shelves</span>
+                  </div>
+                  <span className="font-semibold text-black">
+                    {selectedWarehouse.shelfCount || 0}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                  <div className="flex items-center gap-2">
+                    <Package className="h-5 w-5 text-gray-400" />
+                    <span className="text-sm text-gray-600">Items</span>
+                  </div>
+                  <span className="font-semibold text-black">
+                    {selectedWarehouse.itemCount || 0}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-5 w-5 text-gray-400" />
+                    <span className="text-sm text-gray-600">Dimensions</span>
+                  </div>
+                  <span className="font-semibold text-black">
+                    {selectedWarehouse.width}x{selectedWarehouse.height}
+                  </span>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between border-t pt-4">
-                <span className="text-sm text-gray-600">Total Items</span>
-                <span className="text-lg font-bold text-black">
-                  {selectedZoneData?.items}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Category</span>
-                <span className="text-sm font-medium text-black">
-                  Electronics
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Status</span>
-                <span className="text-sm font-medium text-green-600">
-                  Active
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between border-b pb-4">
-                <span className="text-sm text-gray-600">Last Updated</span>
-                <span className="text-sm font-medium text-black">
-                  2 min ago
-                </span>
-              </div>
-
-              <button className="w-full rounded-lg bg-[#FFC107] px-4 py-3 font-semibold text-black transition hover:bg-[#FFB300]">
-                View Details
-              </button>
+              {/* Open Map Button */}
+              <Link href={`/warehouse/${selectedWarehouse.id}`}>
+                <Button className="w-full">
+                  <MapPin className="mr-2 h-4 w-4" />
+                  Open Map View
+                </Button>
+              </Link>
             </div>
-          </div>
+          )}
         </div>
       </main>
+
+      {/* Create Zone Dialog */}
+      <Dialog open={showCreateZone} onOpenChange={setShowCreateZone}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add New Zone</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleCreateZone}>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="zone-name">Zone Name</Label>
+                <Input
+                  id="zone-name"
+                  value={newZoneName}
+                  onChange={(e) => setNewZoneName(e.target.value)}
+                  placeholder="e.g., Main Storage"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowCreateZone(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={!newZoneName.trim()}>
+                Create Zone
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
