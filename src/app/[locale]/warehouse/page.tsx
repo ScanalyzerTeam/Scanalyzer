@@ -7,6 +7,7 @@ import {
   MapPin,
   Package,
   Plus,
+  Trash2,
   Warehouse as WarehouseIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -84,6 +85,32 @@ const WarehousePage = () => {
       router.push(`/warehouse/${newWarehouse.id}`);
     },
   });
+
+  // Delete warehouse mutation
+  const deleteWarehouse = useMutation({
+    mutationFn: async (warehouseId: string) => {
+      const res = await fetch(`/api/warehouse?id=${warehouseId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete warehouse");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["warehouses"] });
+      setSelectedZoneId(null);
+    },
+  });
+
+  const handleDeleteZone = () => {
+    if (
+      selectedZoneId &&
+      confirm(
+        "Are you sure you want to delete this zone? All shelves and items will be permanently deleted.",
+      )
+    ) {
+      deleteWarehouse.mutate(selectedZoneId);
+    }
+  };
 
   const handleCreateZone = (e: React.FormEvent) => {
     e.preventDefault();
@@ -324,7 +351,7 @@ const WarehousePage = () => {
 
           {/* Selected Zone Details Panel */}
           {selectedWarehouse && (
-            <div className="w-80 border-l border-gray-200 bg-white p-6">
+            <div className="flex w-80 flex-col border-l border-gray-200 bg-white p-6">
               <div className="mb-6 flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-black">
                   Zone Details
@@ -407,6 +434,19 @@ const WarehousePage = () => {
                   Open Map View
                 </Button>
               </Link>
+
+              {/* Spacer to push delete button to bottom */}
+              <div className="flex-1" />
+
+              {/* Delete Button at bottom */}
+              <Button
+                variant="outline"
+                className="mt-6 w-full text-red-600 hover:bg-red-50 hover:text-red-700"
+                onClick={handleDeleteZone}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Zone
+              </Button>
             </div>
           )}
         </div>

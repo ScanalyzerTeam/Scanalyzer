@@ -133,7 +133,7 @@ export function ShelfInventoryPanel({
       </div>
 
       {/* Add Item Button */}
-      <div className="border-b border-gray-200 p-4">
+      <div className="border-b border-gray-200 p-4 text-gray-900">
         <Button
           variant="outline"
           className="w-full justify-start"

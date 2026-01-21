@@ -106,19 +106,27 @@ export function KonvaCanvas({
     (attrs: {
       x: number;
       y: number;
-      width: number;
-      height: number;
+      width?: number;
+      height?: number;
       rotation: number;
     }) => {
       if (!selectedShelfId) return;
 
-      onUpdateShelf(selectedShelfId, {
+      const updates: Partial<Shelf> = {
         positionX: attrs.x,
         positionY: attrs.y,
-        width: attrs.width,
-        depth: attrs.height,
         rotation: attrs.rotation,
-      });
+      };
+
+      // Only update dimensions if they were changed (resize operation)
+      if (attrs.width !== undefined) {
+        updates.width = attrs.width;
+      }
+      if (attrs.height !== undefined) {
+        updates.depth = attrs.height;
+      }
+
+      onUpdateShelf(selectedShelfId, updates);
     },
     [selectedShelfId, onUpdateShelf],
   );
@@ -160,16 +168,17 @@ export function KonvaCanvas({
             shelf={shelf}
             isSelected={selectedShelfId === shelf.id}
             onSelect={() => {
-              const stage = stageRef.current;
-              if (stage) {
-                const node = stage.findOne(`#shelf-${shelf.id}`);
-                handleSelectShelf(
-                  shelf.id,
-                  node || (null as unknown as Konva.Node),
-                );
-              } else {
-                handleSelectShelf(shelf.id, null as unknown as Konva.Node);
-              }
+              // Use setTimeout to ensure the node is rendered before finding it
+              setTimeout(() => {
+                const stage = stageRef.current;
+                if (stage) {
+                  const node = stage.findOne(`#shelf-${shelf.id}`);
+                  if (node) {
+                    handleSelectShelf(shelf.id, node);
+                  }
+                }
+              }, 0);
+              onSelectShelf(shelf.id);
             }}
             onDragEnd={(pos) => handleShelfDragEnd(shelf.id, pos)}
           />

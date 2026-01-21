@@ -38,6 +38,7 @@ export function ShelfShape({
 
   return (
     <Group
+      id={`shelf-${shelf.id}`}
       x={shelf.positionX}
       y={shelf.positionY}
       rotation={shelf.rotation}

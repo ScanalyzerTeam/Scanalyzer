@@ -9,8 +9,8 @@ interface SelectionTransformerProps {
   onTransformEnd?: (attrs: {
     x: number;
     y: number;
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
     rotation: number;
   }) => void;
 }
@@ -38,15 +38,45 @@ export function SelectionTransformer({
     const scaleX = node.scaleX();
     const scaleY = node.scaleY();
 
-    // Reset scale and apply to width/height
+    // Check if this was a resize operation (scale changed) or just rotation/move
+    const wasResized =
+      Math.abs(scaleX - 1) > 0.01 || Math.abs(scaleY - 1) > 0.01;
+
+    // Reset scale
     node.scaleX(1);
     node.scaleY(1);
+
+    // Only calculate new dimensions if actually resized
+    let width: number | undefined;
+    let height: number | undefined;
+
+    if (wasResized) {
+      // For Groups, get dimensions from children (the Rect inside)
+      if (node.getClassName() === "Group") {
+        const group = node as Konva.Group;
+        const rect = group.findOne("Rect");
+        if (rect) {
+          width = Math.round(rect.width() * scaleX);
+          height = Math.round(rect.height() * scaleY);
+          // Also update the rect's dimensions
+          rect.width(width);
+          rect.height(height);
+        }
+      } else {
+        width = Math.round(node.width() * scaleX);
+        height = Math.round(node.height() * scaleY);
+      }
+
+      // Guard against too small dimensions
+      if (width && width < 30) width = 30;
+      if (height && height < 30) height = 30;
+    }
 
     onTransformEnd({
       x: Math.round(node.x()),
       y: Math.round(node.y()),
-      width: Math.round(node.width() * scaleX),
-      height: Math.round(node.height() * scaleY),
+      width,
+      height,
       rotation: Math.round(node.rotation()),
     });
   };
