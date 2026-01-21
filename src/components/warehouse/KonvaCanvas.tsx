@@ -160,16 +160,17 @@ export function KonvaCanvas({
             shelf={shelf}
             isSelected={selectedShelfId === shelf.id}
             onSelect={() => {
-              const stage = stageRef.current;
-              if (stage) {
-                const node = stage.findOne(`#shelf-${shelf.id}`);
-                handleSelectShelf(
-                  shelf.id,
-                  node || (null as unknown as Konva.Node),
-                );
-              } else {
-                handleSelectShelf(shelf.id, null as unknown as Konva.Node);
-              }
+              // Use setTimeout to ensure the node is rendered before finding it
+              setTimeout(() => {
+                const stage = stageRef.current;
+                if (stage) {
+                  const node = stage.findOne(`#shelf-${shelf.id}`);
+                  if (node) {
+                    handleSelectShelf(shelf.id, node);
+                  }
+                }
+              }, 0);
+              onSelectShelf(shelf.id);
             }}
             onDragEnd={(pos) => handleShelfDragEnd(shelf.id, pos)}
           />

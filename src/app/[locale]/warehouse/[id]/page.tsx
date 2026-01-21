@@ -130,6 +130,24 @@ const WarehouseMapPage = () => {
     }
   };
 
+  const handleRotateLeft = () => {
+    if (!selectedShelfId || !warehouse) return;
+    const shelf = warehouse.shelves.find((s) => s.id === selectedShelfId);
+    if (shelf) {
+      const newRotation = ((shelf.rotation || 0) - 90 + 360) % 360;
+      handleUpdateShelf(selectedShelfId, { rotation: newRotation });
+    }
+  };
+
+  const handleRotateRight = () => {
+    if (!selectedShelfId || !warehouse) return;
+    const shelf = warehouse.shelves.find((s) => s.id === selectedShelfId);
+    if (shelf) {
+      const newRotation = ((shelf.rotation || 0) + 90) % 360;
+      handleUpdateShelf(selectedShelfId, { rotation: newRotation });
+    }
+  };
+
   const selectedShelf = warehouse?.shelves.find(
     (s) => s.id === selectedShelfId,
   );
@@ -259,6 +277,8 @@ const WarehouseMapPage = () => {
                     onAddShelf={() => createShelf.mutate(warehouse.id)}
                     selectedShelfId={selectedShelfId}
                     onDeleteShelf={handleDeleteShelf}
+                    onRotateLeft={handleRotateLeft}
+                    onRotateRight={handleRotateRight}
                   />
                 </div>
 
