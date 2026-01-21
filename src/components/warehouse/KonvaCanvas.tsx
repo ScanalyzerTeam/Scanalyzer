@@ -106,19 +106,27 @@ export function KonvaCanvas({
     (attrs: {
       x: number;
       y: number;
-      width: number;
-      height: number;
+      width?: number;
+      height?: number;
       rotation: number;
     }) => {
       if (!selectedShelfId) return;
 
-      onUpdateShelf(selectedShelfId, {
+      const updates: Partial<Shelf> = {
         positionX: attrs.x,
         positionY: attrs.y,
-        width: attrs.width,
-        depth: attrs.height,
         rotation: attrs.rotation,
-      });
+      };
+
+      // Only update dimensions if they were changed (resize operation)
+      if (attrs.width !== undefined) {
+        updates.width = attrs.width;
+      }
+      if (attrs.height !== undefined) {
+        updates.depth = attrs.height;
+      }
+
+      onUpdateShelf(selectedShelfId, updates);
     },
     [selectedShelfId, onUpdateShelf],
   );

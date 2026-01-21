@@ -9,8 +9,8 @@ interface SelectionTransformerProps {
   onTransformEnd?: (attrs: {
     x: number;
     y: number;
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
     rotation: number;
   }) => void;
 }
@@ -38,28 +38,39 @@ export function SelectionTransformer({
     const scaleX = node.scaleX();
     const scaleY = node.scaleY();
 
+    // Check if this was a resize operation (scale changed) or just rotation/move
+    const wasResized =
+      Math.abs(scaleX - 1) > 0.01 || Math.abs(scaleY - 1) > 0.01;
+
     // Reset scale
     node.scaleX(1);
     node.scaleY(1);
 
-    // For Groups, get dimensions from the client rect or children
-    let width = node.width();
-    let height = node.height();
+    // Only calculate new dimensions if actually resized
+    let width: number | undefined;
+    let height: number | undefined;
 
-    // If node is a Group, get dimensions from its bounding box
-    if (node.getClassName() === "Group") {
-      const clientRect = node.getClientRect({ skipTransform: true });
-      width = clientRect.width;
-      height = clientRect.height;
+    if (wasResized) {
+      // For Groups, get dimensions from children (the Rect inside)
+      if (node.getClassName() === "Group") {
+        const group = node as Konva.Group;
+        const rect = group.findOne("Rect");
+        if (rect) {
+          width = Math.round(rect.width() * scaleX);
+          height = Math.round(rect.height() * scaleY);
+          // Also update the rect's dimensions
+          rect.width(width);
+          rect.height(height);
+        }
+      } else {
+        width = Math.round(node.width() * scaleX);
+        height = Math.round(node.height() * scaleY);
+      }
+
+      // Guard against too small dimensions
+      if (width && width < 30) width = 30;
+      if (height && height < 30) height = 30;
     }
-
-    // Apply scale to dimensions
-    width = Math.round(width * scaleX);
-    height = Math.round(height * scaleY);
-
-    // Guard against zero dimensions
-    if (width < 30) width = 100;
-    if (height < 30) height = 50;
 
     onTransformEnd({
       x: Math.round(node.x()),
