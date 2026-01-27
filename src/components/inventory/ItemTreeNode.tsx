@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Folder,
   Package,
+  Plus,
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
@@ -68,18 +69,19 @@ export function ItemTreeNode({
           </span>
         )}
 
+        {item.isContainer && onAddChild && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onAddChild(item.id)}
+            className="h-6 w-6 p-0 text-blue-500 hover:bg-blue-50 hover:text-blue-600"
+            title="Add item inside"
+          >
+            <Plus className="h-3 w-3" />
+          </Button>
+        )}
+
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
-          {item.isContainer && onAddChild && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onAddChild(item.id)}
-              className="h-6 w-6 p-0"
-              title="Add item inside"
-            >
-              <Package className="h-3 w-3" />
-            </Button>
-          )}
           <Button
             variant="ghost"
             size="sm"
