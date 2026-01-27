@@ -6,8 +6,13 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { Item, Shelf } from "@/lib/warehouse/types";
+import type {
+  Item,
+  ItemTreeNode as ItemTreeNodeType,
+  Shelf,
+} from "@/lib/warehouse/types";
 
+import type { ItemFormInitialData } from "./ItemForm";
 import { ItemForm } from "./ItemForm";
 import { ItemTree } from "./ItemTree";
 
@@ -25,6 +30,9 @@ export function ShelfInventoryPanel({
   const [parentIdForNewItem, setParentIdForNewItem] = useState<string | null>(
     null,
   );
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [editInitialData, setEditInitialData] =
+    useState<ItemFormInitialData | null>(null);
 
   // Fetch items for this shelf
   const { data: items = [], isLoading } = useQuery<Item[]>({
@@ -76,19 +84,68 @@ export function ShelfInventoryPanel({
     },
   });
 
+  // Update item mutation
+  const updateItem = useMutation({
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: { name: string; description: string; quantity: number };
+    }) => {
+      const res = await fetch(`/api/items/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error("Failed to update item");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["items", shelf.id] });
+    },
+  });
+
   const handleAddItem = (parentId: string | null = null) => {
+    setEditingItemId(null);
+    setEditInitialData(null);
     setParentIdForNewItem(parentId);
     setShowItemForm(true);
   };
 
-  const handleCreateItem = (data: {
+  const handleSubmitItem = (data: {
     name: string;
     description: string;
     isContainer: boolean;
     quantity: number;
     parentId: string | null;
   }) => {
-    createItem.mutate(data);
+    if (editingItemId) {
+      updateItem.mutate({
+        id: editingItemId,
+        data: {
+          name: data.name,
+          description: data.description,
+          quantity: data.quantity,
+        },
+      });
+      setEditingItemId(null);
+      setEditInitialData(null);
+    } else {
+      createItem.mutate(data);
+    }
+  };
+
+  const handleEditItem = (item: ItemTreeNodeType) => {
+    setEditingItemId(item.id);
+    setEditInitialData({
+      name: item.name,
+      description: item.description || "",
+      isContainer: item.isContainer,
+      quantity: item.quantity,
+    });
+    setParentIdForNewItem(item.parentId ?? null);
+    setShowItemForm(true);
   };
 
   const handleDeleteItem = (itemId: string) => {
@@ -155,6 +212,7 @@ export function ShelfInventoryPanel({
             items={items}
             onDelete={handleDeleteItem}
             onAddChild={handleAddItem}
+            onEdit={handleEditItem}
           />
         )}
       </ScrollArea>
@@ -162,10 +220,17 @@ export function ShelfInventoryPanel({
       {/* Item Form Dialog */}
       <ItemForm
         open={showItemForm}
-        onOpenChange={setShowItemForm}
-        onSubmit={handleCreateItem}
+        onOpenChange={(open) => {
+          setShowItemForm(open);
+          if (!open) {
+            setEditingItemId(null);
+            setEditInitialData(null);
+          }
+        }}
+        onSubmit={handleSubmitItem}
         parentId={parentIdForNewItem}
         shelfName={shelf.name}
+        initialData={editInitialData}
       />
     </div>
   );

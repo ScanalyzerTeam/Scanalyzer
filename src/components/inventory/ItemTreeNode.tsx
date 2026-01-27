@@ -5,6 +5,8 @@ import {
   ChevronRight,
   Folder,
   Package,
+  Pencil,
+  Plus,
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
@@ -16,12 +18,14 @@ interface ItemTreeNodeProps {
   item: ItemTreeNodeType;
   onDelete: (itemId: string) => void;
   onAddChild?: (parentId: string) => void;
+  onEdit?: (item: ItemTreeNodeType) => void;
 }
 
 export function ItemTreeNode({
   item,
   onDelete,
   onAddChild,
+  onEdit,
 }: ItemTreeNodeProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -68,16 +72,28 @@ export function ItemTreeNode({
           </span>
         )}
 
+        {item.isContainer && onAddChild && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onAddChild(item.id)}
+            className="h-6 w-6 p-0 text-blue-500 hover:bg-blue-50 hover:text-blue-600"
+            title="Add item inside"
+          >
+            <Plus className="h-3 w-3" />
+          </Button>
+        )}
+
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
-          {item.isContainer && onAddChild && (
+          {onEdit && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onAddChild(item.id)}
-              className="h-6 w-6 p-0"
-              title="Add item inside"
+              onClick={() => onEdit(item)}
+              className="h-6 w-6 p-0 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              title="Edit"
             >
-              <Package className="h-3 w-3" />
+              <Pencil className="h-3 w-3" />
             </Button>
           )}
           <Button
@@ -100,6 +116,7 @@ export function ItemTreeNode({
               item={child}
               onDelete={onDelete}
               onAddChild={onAddChild}
+              onEdit={onEdit}
             />
           ))}
         </div>
