@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +12,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+export interface ItemFormInitialData {
+  name: string;
+  description: string;
+  isContainer: boolean;
+  quantity: number;
+}
 
 interface ItemFormProps {
   open: boolean;
@@ -25,6 +32,7 @@ interface ItemFormProps {
   }) => void;
   parentId?: string | null;
   shelfName?: string;
+  initialData?: ItemFormInitialData | null;
 }
 
 export function ItemForm({
@@ -33,11 +41,29 @@ export function ItemForm({
   onSubmit,
   parentId = null,
   shelfName,
+  initialData = null,
 }: ItemFormProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isContainer, setIsContainer] = useState(false);
   const [quantity, setQuantity] = useState(1);
+
+  const isEditing = initialData !== null;
+
+  // Pre-populate form when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      setName(initialData.name);
+      setDescription(initialData.description);
+      setIsContainer(initialData.isContainer);
+      setQuantity(initialData.quantity);
+    } else {
+      setName("");
+      setDescription("");
+      setIsContainer(false);
+      setQuantity(1);
+    }
+  }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,11 +85,13 @@ export function ItemForm({
     onOpenChange(false);
   };
 
-  const title = parentId
-    ? "Add Item to Container"
-    : shelfName
-      ? `Add Item to ${shelfName}`
-      : "Add Item";
+  const title = isEditing
+    ? "Edit Item"
+    : parentId
+      ? "Add Item to Container"
+      : shelfName
+        ? `Add Item to ${shelfName}`
+        : "Add Item";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -99,9 +127,13 @@ export function ItemForm({
                 id="isContainer"
                 checked={isContainer}
                 onChange={(e) => setIsContainer(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300"
+                disabled={isEditing}
+                className="h-4 w-4 rounded border-gray-300 disabled:opacity-50"
               />
-              <Label htmlFor="isContainer" className="cursor-pointer">
+              <Label
+                htmlFor="isContainer"
+                className={`cursor-pointer ${isEditing ? "opacity-50" : ""}`}
+              >
                 This is a container (box, bin, etc.)
               </Label>
             </div>
@@ -129,7 +161,9 @@ export function ItemForm({
               Cancel
             </Button>
             <Button type="submit" disabled={!name.trim()}>
-              Add {isContainer ? "Container" : "Item"}
+              {isEditing
+                ? "Save Changes"
+                : `Add ${isContainer ? "Container" : "Item"}`}
             </Button>
           </DialogFooter>
         </form>

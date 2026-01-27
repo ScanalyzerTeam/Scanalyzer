@@ -11,6 +11,7 @@ interface ItemTreeProps {
   items: Item[];
   onDelete: (itemId: string) => void;
   onAddChild?: (parentId: string) => void;
+  onEdit?: (item: ItemTreeNodeType) => void;
 }
 
 // Build tree structure from flat items array
@@ -49,7 +50,12 @@ function buildTree(items: Item[]): ItemTreeNodeType[] {
   return roots;
 }
 
-export function ItemTree({ items, onDelete, onAddChild }: ItemTreeProps) {
+export function ItemTree({
+  items,
+  onDelete,
+  onAddChild,
+  onEdit,
+}: ItemTreeProps) {
   const treeNodes = buildTree(items);
 
   if (treeNodes.length === 0) {
@@ -68,6 +74,7 @@ export function ItemTree({ items, onDelete, onAddChild }: ItemTreeProps) {
           item={node}
           onDelete={onDelete}
           onAddChild={onAddChild}
+          onEdit={onEdit}
         />
       ))}
     </div>

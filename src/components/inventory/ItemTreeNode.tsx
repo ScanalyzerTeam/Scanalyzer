@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Folder,
   Package,
+  Pencil,
   Plus,
   Trash2,
 } from "lucide-react";
@@ -17,12 +18,14 @@ interface ItemTreeNodeProps {
   item: ItemTreeNodeType;
   onDelete: (itemId: string) => void;
   onAddChild?: (parentId: string) => void;
+  onEdit?: (item: ItemTreeNodeType) => void;
 }
 
 export function ItemTreeNode({
   item,
   onDelete,
   onAddChild,
+  onEdit,
 }: ItemTreeNodeProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -82,6 +85,17 @@ export function ItemTreeNode({
         )}
 
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+          {onEdit && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onEdit(item)}
+              className="h-6 w-6 p-0 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              title="Edit"
+            >
+              <Pencil className="h-3 w-3" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="sm"
@@ -102,6 +116,7 @@ export function ItemTreeNode({
               item={child}
               onDelete={onDelete}
               onAddChild={onAddChild}
+              onEdit={onEdit}
             />
           ))}
         </div>
