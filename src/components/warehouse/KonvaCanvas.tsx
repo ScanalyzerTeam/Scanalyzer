@@ -1,7 +1,7 @@
 "use client";
 
 import Konva from "konva";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Layer, Stage } from "react-konva";
 
 import type { Shelf, Warehouse } from "@/lib/warehouse/types";
@@ -37,7 +37,26 @@ export function KonvaCanvas({
   onPositionChange,
 }: KonvaCanvasProps) {
   const stageRef = useRef<Konva.Stage>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [selectedNode, setSelectedNode] = useState<Konva.Node | null>(null);
+  const [containerWidth, setContainerWidth] = useState(warehouse.width);
+  const [containerHeight, setContainerHeight] = useState(warehouse.height);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) {
+        setContainerWidth(entry.contentRect.width);
+        setContainerHeight(entry.contentRect.height);
+      }
+    });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const handleWheel = useCallback(
     (e: Konva.KonvaEventObject<WheelEvent>) => {
@@ -143,51 +162,62 @@ export function KonvaCanvas({
     [onPositionChange],
   );
 
+  const gridWidth = Math.max(
+    warehouse.width * 2,
+    containerWidth / scale + Math.abs(position.x) / scale + 500,
+  );
+  const gridHeight = Math.max(
+    warehouse.height * 2,
+    containerHeight / scale + Math.abs(position.y) / scale + 500,
+  );
+
   return (
-    <Stage
-      ref={stageRef}
-      width={warehouse.width}
-      height={warehouse.height}
-      scaleX={scale}
-      scaleY={scale}
-      x={position.x}
-      y={position.y}
-      draggable
-      onWheel={handleWheel}
-      onClick={handleStageClick}
-      onTap={handleStageClick}
-      onDragEnd={handleDragEnd}
-    >
-      <Layer>
-        <GridLayer width={warehouse.width * 2} height={warehouse.height * 2} />
-      </Layer>
-      <Layer>
-        {shelves.map((shelf) => (
-          <ShelfShape
-            key={shelf.id}
-            shelf={shelf}
-            isSelected={selectedShelfId === shelf.id}
-            onSelect={() => {
-              // Use setTimeout to ensure the node is rendered before finding it
-              setTimeout(() => {
-                const stage = stageRef.current;
-                if (stage) {
-                  const node = stage.findOne(`#shelf-${shelf.id}`);
-                  if (node) {
-                    handleSelectShelf(shelf.id, node);
+    <div ref={containerRef} className="h-full w-full">
+      <Stage
+        ref={stageRef}
+        width={containerWidth}
+        height={containerHeight}
+        scaleX={scale}
+        scaleY={scale}
+        x={position.x}
+        y={position.y}
+        draggable
+        onWheel={handleWheel}
+        onClick={handleStageClick}
+        onTap={handleStageClick}
+        onDragEnd={handleDragEnd}
+      >
+        <Layer>
+          <GridLayer width={gridWidth} height={gridHeight} gridSize={25} />
+        </Layer>
+        <Layer>
+          {shelves.map((shelf) => (
+            <ShelfShape
+              key={shelf.id}
+              shelf={shelf}
+              isSelected={selectedShelfId === shelf.id}
+              onSelect={() => {
+                // Use setTimeout to ensure the node is rendered before finding it
+                setTimeout(() => {
+                  const stage = stageRef.current;
+                  if (stage) {
+                    const node = stage.findOne(`#shelf-${shelf.id}`);
+                    if (node) {
+                      handleSelectShelf(shelf.id, node);
+                    }
                   }
-                }
-              }, 0);
-              onSelectShelf(shelf.id);
-            }}
-            onDragEnd={(pos) => handleShelfDragEnd(shelf.id, pos)}
+                }, 0);
+                onSelectShelf(shelf.id);
+              }}
+              onDragEnd={(pos) => handleShelfDragEnd(shelf.id, pos)}
+            />
+          ))}
+          <SelectionTransformer
+            selectedNode={selectedNode}
+            onTransformEnd={handleTransformEnd}
           />
-        ))}
-        <SelectionTransformer
-          selectedNode={selectedNode}
-          onTransformEnd={handleTransformEnd}
-        />
-      </Layer>
-    </Stage>
+        </Layer>
+      </Stage>
+    </div>
   );
 }
