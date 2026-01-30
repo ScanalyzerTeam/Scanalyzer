@@ -117,7 +117,7 @@ const DashboardPage = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {/* Total Items */}
           <div className="rounded-xl bg-white p-6 shadow-sm">
             <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
@@ -158,25 +158,6 @@ const DashboardPage = () => {
             </div>
             <div className="text-2xl font-bold text-black">143</div>
             <div className="text-sm text-gray-600">Scanned Today</div>
-          </div>
-
-          {/* Efficiency */}
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
-              <svg
-                className="h-5 w-5 text-gray-600"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-              </svg>
-            </div>
-            <div className="text-2xl font-bold text-black">94%</div>
-            <div className="text-sm text-gray-600">Efficiency</div>
           </div>
 
           {/* Active Zones */}
