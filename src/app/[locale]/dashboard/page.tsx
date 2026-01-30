@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -7,6 +8,23 @@ import { signOut } from "next-auth/react";
 const DashboardPage = () => {
   const pathname = usePathname();
   const router = useRouter();
+
+  const { data: warehouses } = useQuery({
+    queryKey: ["warehouses"],
+    queryFn: async () => {
+      const res = await fetch("/api/warehouse");
+      if (!res.ok) throw new Error("Failed to fetch warehouses");
+      return res.json();
+    },
+  });
+
+  const totalItems = warehouses
+    ? warehouses.reduce(
+        (sum: number, w: { itemCount?: number }) => sum + (w.itemCount || 0),
+        0,
+      )
+    : null;
+  const activeZones = warehouses ? warehouses.length : null;
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
@@ -115,7 +133,9 @@ const DashboardPage = () => {
                 <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
               </svg>
             </div>
-            <div className="text-2xl font-bold text-black">2,547</div>
+            <div className="text-2xl font-bold text-black">
+              {totalItems !== null ? totalItems.toLocaleString() : "—"}
+            </div>
             <div className="text-sm text-gray-600">Total Items</div>
           </div>
 
@@ -176,7 +196,9 @@ const DashboardPage = () => {
                 <line x1="6" y1="20" x2="6" y2="16" />
               </svg>
             </div>
-            <div className="text-2xl font-bold text-black">8</div>
+            <div className="text-2xl font-bold text-black">
+              {activeZones !== null ? activeZones : "—"}
+            </div>
             <div className="text-sm text-gray-600">Active Zones</div>
           </div>
         </div>
