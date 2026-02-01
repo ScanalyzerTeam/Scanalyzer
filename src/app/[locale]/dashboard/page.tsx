@@ -1,9 +1,9 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
+
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
 const DashboardPage = () => {
   const pathname = usePathname();
@@ -15,6 +15,15 @@ const DashboardPage = () => {
       const res = await fetch("/api/warehouse");
       if (!res.ok) throw new Error("Failed to fetch warehouses");
       return res.json();
+    },
+  });
+
+  const { data: scansToday } = useQuery({
+    queryKey: ["scansToday"],
+    queryFn: async () => {
+      const res = await fetch("/api/scans/today");
+      if (!res.ok) throw new Error("Failed to fetch scan count");
+      return res.json() as Promise<{ count: number }>;
     },
   });
 
@@ -156,7 +165,9 @@ const DashboardPage = () => {
                 <path d="M10 13h4" />
               </svg>
             </div>
-            <div className="text-2xl font-bold text-black">143</div>
+            <div className="text-2xl font-bold text-black">
+              {scansToday ? scansToday.count : "—"}
+            </div>
             <div className="text-sm text-gray-600">Scanned Today</div>
           </div>
 

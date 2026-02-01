@@ -10,8 +10,6 @@ import {
   Trash2,
   Warehouse as WarehouseIcon,
 } from "lucide-react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
 
@@ -25,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import type { Warehouse } from "@/lib/warehouse/types";
 
 interface WarehouseWithStats extends Warehouse {
