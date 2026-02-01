@@ -3,6 +3,7 @@ import OpenAI from "openai";
 
 import { env } from "@/env.mjs";
 import { auth } from "@/lib/auth";
+import { db, scans } from "@/lib/schema";
 
 const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
 
@@ -37,9 +38,10 @@ export async function POST(request: Request) {
 - description: a brief description (materials, color, condition, brand if visible)
 - quantity: how many of this item are visible (integer >= 1)
 - isContainer: true if the item is a box, bin, crate, shelf, or container that could hold other items
+- containedIn: if the item is visually inside a container that is also in the list, set this to the exact name of that container; otherwise null
 
 Respond ONLY with a JSON array. No markdown, no explanation. Example:
-[{"name":"Cardboard Box","description":"Brown cardboard shipping box, medium size","quantity":3,"isContainer":true}]`,
+[{"name":"Cardboard Box","description":"Brown cardboard shipping box, medium size","quantity":3,"isContainer":true,"containedIn":null},{"name":"Red Mug","description":"Ceramic red mug","quantity":1,"isContainer":false,"containedIn":"Cardboard Box"}]`,
         },
         {
           role: "user",
@@ -74,6 +76,12 @@ Respond ONLY with a JSON array. No markdown, no explanation. Example:
         { status: 502 },
       );
     }
+
+    // Record this scan
+    await db.insert(scans).values({
+      userId: session.user.id,
+      itemCount: items.length,
+    });
 
     return NextResponse.json({ items });
   } catch (error) {

@@ -1,8 +1,6 @@
 "use client";
 
 import { Camera, CheckCircle, Loader2, RotateCcw } from "lucide-react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -15,6 +13,7 @@ import {
 } from "@/components/scanner/SuggestionsList";
 import { WarehouseShelfSelector } from "@/components/scanner/WarehouseShelfSelector";
 import { Button } from "@/components/ui/button";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
 type ScanState = "capture" | "analyzing" | "review" | "creating" | "done";
 
@@ -68,9 +67,11 @@ const ScannerPage = () => {
           description: string;
           quantity: number;
           isContainer: boolean;
+          containedIn: string | null;
         }) => ({
           ...item,
           included: true,
+          containedIn: item.containedIn ?? null,
         }),
       );
       setItems(suggestions);
@@ -87,9 +88,16 @@ const ScannerPage = () => {
 
     setState("creating");
 
-    const results = await Promise.allSettled(
-      included.map((item) =>
-        fetch("/api/items", {
+    let created = 0;
+
+    // Pass 1: Create top-level items (no containedIn), collect name→id map
+    const topLevel = included.filter((i) => !i.containedIn);
+    const children = included.filter((i) => i.containedIn);
+    const nameToId: Record<string, string> = {};
+
+    for (const item of topLevel) {
+      try {
+        const res = await fetch("/api/items", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -99,13 +107,47 @@ const ScannerPage = () => {
             isContainer: item.isContainer,
             quantity: item.quantity,
           }),
-        }),
-      ),
-    );
+        });
+        if (res.ok) {
+          created++;
+          const newItem = await res.json();
+          if (item.isContainer) {
+            nameToId[item.name] = newItem.id;
+          }
+        }
+      } catch {
+        // continue with remaining items
+      }
+    }
 
-    const created = results.filter(
-      (r) => r.status === "fulfilled" && (r.value as Response).ok,
-    ).length;
+    // Pass 2: Create child items with parentId
+    for (const item of children) {
+      const parentId = item.containedIn ? nameToId[item.containedIn] : null;
+      try {
+        const res = await fetch("/api/items", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            shelfId,
+            parentId: parentId || null,
+            name: item.name,
+            description: item.description,
+            isContainer: item.isContainer,
+            quantity: item.quantity,
+          }),
+        });
+        if (res.ok) {
+          created++;
+          const newItem = await res.json();
+          if (item.isContainer) {
+            nameToId[item.name] = newItem.id;
+          }
+        }
+      } catch {
+        // continue with remaining items
+      }
+    }
+
     setCreateResult({ created, total: included.length });
     setState("done");
   };
