@@ -98,6 +98,18 @@ export const authenticators = pgTable(
   ],
 );
 
+// Scan tracking
+export const scans = pgTable("scan", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  itemCount: integer("itemCount").notNull().default(0),
+  createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+});
+
 // Warehouse tables
 export const warehouses = pgTable("warehouse", {
   id: text("id")
