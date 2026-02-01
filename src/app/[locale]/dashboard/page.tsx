@@ -187,7 +187,10 @@ const DashboardPage = () => {
         {/* Action Cards */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Scan Items Card */}
-          <div className="group cursor-pointer rounded-xl bg-[#FFC107] p-8 shadow-sm transition hover:shadow-lg">
+          <Link
+            href="/scanner"
+            className="group cursor-pointer rounded-xl bg-[#FFC107] p-8 shadow-sm transition hover:shadow-lg"
+          >
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-black/10">
               <svg
                 className="h-8 w-8 text-black"
@@ -207,7 +210,7 @@ const DashboardPage = () => {
             </div>
             <h3 className="mb-2 text-xl font-bold text-black">Scan Items</h3>
             <p className="text-black/80">Start scanning warehouse items</p>
-          </div>
+          </Link>
 
           {/* AI Assistant Card */}
           <div className="group cursor-pointer rounded-xl bg-white p-8 shadow-sm transition hover:shadow-lg">

@@ -1,13 +1,35 @@
 "use client";
 
+import { Camera, CheckCircle, Loader2, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
+
+import { AnalyzingSpinner } from "@/components/scanner/AnalyzingSpinner";
+import { PhotoCapture } from "@/components/scanner/PhotoCapture";
+import {
+  type SuggestedItem,
+  SuggestionsList,
+} from "@/components/scanner/SuggestionsList";
+import { WarehouseShelfSelector } from "@/components/scanner/WarehouseShelfSelector";
+import { Button } from "@/components/ui/button";
+
+type ScanState = "capture" | "analyzing" | "review" | "creating" | "done";
 
 const ScannerPage = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations("scanner");
+
+  const [state, setState] = useState<ScanState>("capture");
+  const [imageUrl, setImageUrl] = useState("");
+  const [items, setItems] = useState<SuggestedItem[]>([]);
+  const [error, setError] = useState("");
+  const [warehouseId, setWarehouseId] = useState("");
+  const [shelfId, setShelfId] = useState("");
+  const [createResult, setCreateResult] = useState({ created: 0, total: 0 });
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
@@ -22,15 +44,83 @@ const ScannerPage = () => {
     { icon: "👤", label: "Profile", href: "/profile" },
   ];
 
-  const recentScans = [
-    { title: "Product 47", meta: "ITEM-8472 • Zone A", time: "10:23 AM" },
-    { title: "Product 23", meta: "ITEM-2156 • Zone B", time: "10:21 AM" },
-    { title: "Product 81", meta: "ITEM-9834 • Zone A", time: "10:18 AM" },
-    { title: "Product 12", meta: "ITEM-5621 • Zone C", time: "10:15 AM" },
-    { title: "Product 94", meta: "ITEM-7483 • Zone A", time: "10:12 AM" },
-  ];
+  const handleCapture = async (dataUrl: string) => {
+    setImageUrl(dataUrl);
+    setError("");
+    setState("analyzing");
 
-  const [scanning, setScanning] = useState(false);
+    try {
+      const res = await fetch("/api/scan/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: dataUrl }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Analysis failed");
+      }
+
+      const data = await res.json();
+      const suggestions: SuggestedItem[] = data.items.map(
+        (item: {
+          name: string;
+          description: string;
+          quantity: number;
+          isContainer: boolean;
+        }) => ({
+          ...item,
+          included: true,
+        }),
+      );
+      setItems(suggestions);
+      setState("review");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Analysis failed");
+      setState("capture");
+    }
+  };
+
+  const handleCreate = async () => {
+    const included = items.filter((i) => i.included);
+    if (!shelfId || included.length === 0) return;
+
+    setState("creating");
+
+    const results = await Promise.allSettled(
+      included.map((item) =>
+        fetch("/api/items", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            shelfId,
+            name: item.name,
+            description: item.description,
+            isContainer: item.isContainer,
+            quantity: item.quantity,
+          }),
+        }),
+      ),
+    );
+
+    const created = results.filter(
+      (r) => r.status === "fulfilled" && (r.value as Response).ok,
+    ).length;
+    setCreateResult({ created, total: included.length });
+    setState("done");
+  };
+
+  const resetScan = () => {
+    setState("capture");
+    setImageUrl("");
+    setItems([]);
+    setError("");
+    setWarehouseId("");
+    setShelfId("");
+  };
+
+  const includedCount = items.filter((i) => i.included).length;
+  const canCreate = shelfId && includedCount > 0;
 
   return (
     <div className="flex min-h-screen bg-[#1a1d2e]">
@@ -99,74 +189,136 @@ const ScannerPage = () => {
       {/* Main Content */}
       <main className="flex-1 bg-[#f5f5f5] p-8">
         <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-black">Scanner</h1>
-          <p className="text-gray-600">Scan and track warehouse items</p>
+          <h1 className="mb-2 text-3xl font-bold text-black">{t("title")}</h1>
+          <p className="text-gray-600">{t("subtitle")}</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Scan Card */}
-          <div className="lg:col-span-2">
-            <div className="flex h-full flex-col items-center justify-center rounded-xl bg-white p-6 shadow-sm">
-              <div className="mb-6 flex h-64 w-full items-center justify-center">
-                <div className="flex h-56 w-full max-w-md items-center justify-center rounded-xl border-2 border-gray-200">
-                  <svg
-                    className="h-20 w-20 text-gray-300"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <path d="M9 3v4" />
-                    <path d="M15 3v4" />
-                    <path d="M9 21v-4" />
-                    <path d="M15 21v-4" />
-                  </svg>
+        <div className="mx-auto max-w-3xl">
+          {/* CAPTURE STATE */}
+          {state === "capture" && (
+            <div className="rounded-xl bg-white p-8 shadow-sm">
+              <PhotoCapture onCapture={handleCapture} />
+              {error && (
+                <div className="mt-4 rounded-lg bg-red-50 p-3 text-center text-sm text-red-600">
+                  {error}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ANALYZING STATE */}
+          {state === "analyzing" && (
+            <div className="rounded-xl bg-white p-8 shadow-sm">
+              <AnalyzingSpinner imageUrl={imageUrl} />
+            </div>
+          )}
+
+          {/* REVIEW STATE */}
+          {state === "review" && (
+            <div className="space-y-6">
+              {/* Image thumbnail */}
+              <div className="rounded-xl bg-white p-4 shadow-sm">
+                <div className="flex items-center gap-4">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={imageUrl}
+                    alt="Scanned"
+                    className="h-20 w-20 rounded-lg object-cover"
+                  />
+                  <div>
+                    <h3 className="font-semibold text-black">
+                      {t("itemsDetected", { count: items.length })}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {t("reviewDescription")}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <button
-                onClick={() => setScanning((s) => !s)}
-                className="rounded-lg bg-[#FFC107] px-6 py-3 font-semibold text-black transition hover:bg-[#FFB300]"
-              >
-                {scanning ? "Stop Scan" : "Start Scan"}
-              </button>
-            </div>
-          </div>
+              {/* Warehouse / Shelf selector */}
+              <div className="rounded-xl bg-white p-4 shadow-sm">
+                <h3 className="mb-3 text-sm font-semibold text-black">
+                  {t("destination")}
+                </h3>
+                <WarehouseShelfSelector
+                  warehouseId={warehouseId}
+                  shelfId={shelfId}
+                  onWarehouseChange={setWarehouseId}
+                  onShelfChange={setShelfId}
+                />
+              </div>
 
-          {/* Recent Scans */}
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-black">Recent Scans</h3>
-                <p className="text-sm text-gray-500">
-                  Total scanned: {recentScans.length}
+              {/* Items list */}
+              <div className="rounded-xl bg-white p-4 shadow-sm">
+                <h3 className="mb-3 text-sm font-semibold text-black">
+                  {t("suggestedItems")}
+                </h3>
+                <SuggestionsList items={items} onChange={setItems} />
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-between">
+                <Button
+                  variant="outline"
+                  onClick={resetScan}
+                  className="text-black"
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  {t("scanAgain")}
+                </Button>
+                <Button
+                  onClick={handleCreate}
+                  disabled={!canCreate}
+                  className="bg-[#FFC107] text-black hover:bg-[#FFB300] disabled:opacity-50"
+                >
+                  {t("createItems")} ({includedCount})
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* CREATING STATE */}
+          {state === "creating" && (
+            <div className="rounded-xl bg-white p-8 shadow-sm">
+              <div className="flex flex-col items-center gap-4">
+                <Loader2 className="h-8 w-8 animate-spin text-[#FFC107]" />
+                <p className="text-sm font-medium text-gray-600">
+                  {t("creatingItems")}
                 </p>
               </div>
             </div>
+          )}
 
-            <div className="divide-y">
-              {recentScans.map((scan, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between py-4"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#FFF9E6] text-[#FFC107]">
-                      ✓
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium text-black">
-                        {scan.title}
-                      </div>
-                      <div className="text-xs text-gray-500">{scan.meta}</div>
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-500">{scan.time}</div>
+          {/* DONE STATE */}
+          {state === "done" && (
+            <div className="rounded-xl bg-white p-8 shadow-sm">
+              <div className="flex flex-col items-center gap-4">
+                <CheckCircle className="h-12 w-12 text-green-500" />
+                <h3 className="text-lg font-semibold text-black">
+                  {t("createdResult", {
+                    created: createResult.created,
+                    total: createResult.total,
+                  })}
+                </h3>
+                <div className="flex gap-4">
+                  <Button
+                    variant="outline"
+                    onClick={resetScan}
+                    className="text-black"
+                  >
+                    <Camera className="mr-2 h-4 w-4" />
+                    {t("scanMore")}
+                  </Button>
+                  <Link href="/warehouse">
+                    <Button className="bg-[#FFC107] text-black hover:bg-[#FFB300]">
+                      {t("viewWarehouse")}
+                    </Button>
+                  </Link>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
     </div>
