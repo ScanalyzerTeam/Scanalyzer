@@ -10,6 +10,7 @@ import { env } from "@/env.mjs";
 import { db, users } from "@/lib/schema";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
+  trustHost: true,
   adapter: DrizzleAdapter(db) as Adapter,
   providers: [
     CredentialsProvider({
