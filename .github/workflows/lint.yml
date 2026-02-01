@@ -9,6 +9,8 @@ jobs:
   lint:
     name: Eslint, Typescript, prettier and test
     runs-on: ubuntu-latest
+    env:
+      SKIP_ENV_VALIDATION: "1"
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies

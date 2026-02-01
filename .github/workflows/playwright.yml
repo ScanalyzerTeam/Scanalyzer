@@ -18,6 +18,7 @@ jobs:
       GITHUB_SECRET: ${{ secrets.AUTH_GITHUB_SECRET || 'test-github-secret' }}
       DATABASE_URL: ${{ secrets.DATABASE_URL || 'file:./test.db' }}
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET || 'test-secret-key' }}
+      SKIP_ENV_VALIDATION: "1"
       NODE_ENV: test
     steps:
       - uses: actions/checkout@v4
