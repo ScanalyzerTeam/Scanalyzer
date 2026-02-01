@@ -52,5 +52,19 @@
     "backToZones": "Back to Zones",
     "warehouseNotFound": "Warehouse not found",
     "warehouseNotFoundDesc": "This warehouse may have been deleted or does not exist"
+  },
+  "scanner": {
+    "title": "Scanner",
+    "subtitle": "Take a photo of items and add them to your warehouse",
+    "itemsDetected": "{count, plural, one {# item detected} other {# items detected}}",
+    "reviewDescription": "Review and edit the suggested items before adding them",
+    "destination": "Destination",
+    "suggestedItems": "Suggested Items",
+    "scanAgain": "Scan Again",
+    "createItems": "Create Items",
+    "creatingItems": "Creating items...",
+    "createdResult": "Created {created} of {total} items",
+    "scanMore": "Scan More",
+    "viewWarehouse": "View Warehouse"
   }
 }

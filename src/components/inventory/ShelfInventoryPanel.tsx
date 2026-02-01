@@ -155,7 +155,7 @@ export function ShelfInventoryPanel({
   };
 
   return (
-    <div className="flex h-full w-80 flex-col border-l border-gray-200 bg-white">
+    <div className="flex h-full w-80 shrink-0 flex-col overflow-hidden border-l border-gray-200 bg-white">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-200 p-4">
         <div className="flex items-center gap-2">

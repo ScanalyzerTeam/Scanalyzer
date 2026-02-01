@@ -153,9 +153,9 @@ const WarehouseMapPage = () => {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#1a1d2e]">
+    <div className="flex h-screen bg-[#1a1d2e]">
       {/* Sidebar */}
-      <aside className="flex w-64 flex-col bg-white p-6">
+      <aside className="flex w-64 shrink-0 flex-col bg-white p-6">
         {/* Logo */}
         <div className="mb-8 flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#FFC107]">
@@ -220,7 +220,7 @@ const WarehouseMapPage = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex flex-1 flex-col bg-[#f5f5f5]">
+      <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f5f5f5]">
         {/* Header */}
         <div className="border-b border-gray-200 bg-white p-6">
           <div className="flex items-center gap-4">
@@ -244,7 +244,7 @@ const WarehouseMapPage = () => {
         {/* Content Area */}
         <div className="flex flex-1 overflow-hidden">
           {/* Canvas Area */}
-          <div className="flex flex-1 flex-col p-6">
+          <div className="flex min-w-0 flex-1 flex-col p-6">
             {isLoading ? (
               <div className="flex flex-1 items-center justify-center">
                 <div className="animate-pulse text-gray-500">Loading...</div>

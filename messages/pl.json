@@ -52,5 +52,19 @@
     "backToZones": "Powrót do Stref",
     "warehouseNotFound": "Nie znaleziono magazynu",
     "warehouseNotFoundDesc": "Ten magazyn mógł zostać usunięty lub nie istnieje"
+  },
+  "scanner": {
+    "title": "Skaner",
+    "subtitle": "Zrób zdjęcie przedmiotów i dodaj je do magazynu",
+    "itemsDetected": "{count, plural, one {Wykryto # przedmiot} few {Wykryto # przedmioty} other {Wykryto # przedmiotów}}",
+    "reviewDescription": "Sprawdź i edytuj sugerowane przedmioty przed dodaniem",
+    "destination": "Miejsce docelowe",
+    "suggestedItems": "Sugerowane Przedmioty",
+    "scanAgain": "Skanuj Ponownie",
+    "createItems": "Utwórz Przedmioty",
+    "creatingItems": "Tworzenie przedmiotów...",
+    "createdResult": "Utworzono {created} z {total} przedmiotów",
+    "scanMore": "Skanuj Więcej",
+    "viewWarehouse": "Zobacz Magazyn"
   }
 }

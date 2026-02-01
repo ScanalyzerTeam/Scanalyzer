@@ -2,6 +2,7 @@ import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
 export const env = createEnv({
+  skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   server: {
     DATABASE_URL: z.string().min(1),
     APP_URL: z.string().url().min(1),
@@ -10,6 +11,7 @@ export const env = createEnv({
     GITHUB_SECRET: z.string().min(1),
     NEXTAUTH_URL: z.string().url().optional(),
     NEXTAUTH_SECRET: z.string().min(1),
+    OPENAI_API_KEY: z.string().min(1),
   },
   client: {},
   runtimeEnv: {
@@ -20,5 +22,6 @@ export const env = createEnv({
     GITHUB_SECRET: process.env.GITHUB_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   },
 });
