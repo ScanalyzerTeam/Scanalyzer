@@ -2,8 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Warehouse as WarehouseIcon } from "lucide-react";
-import Link from "next/link";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
 
@@ -11,6 +10,7 @@ import { ShelfInventoryPanel } from "@/components/inventory/ShelfInventoryPanel"
 import { Button } from "@/components/ui/button";
 import { WarehouseCanvas } from "@/components/warehouse/WarehouseCanvas";
 import { WarehouseToolbar } from "@/components/warehouse/WarehouseToolbar";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import type { Shelf, WarehouseWithShelves } from "@/lib/warehouse/types";
 
 const WarehouseMapPage = () => {

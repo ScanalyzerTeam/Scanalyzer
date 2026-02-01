@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+
+import { Link, useRouter } from "@/i18n/navigation";
 
 const SignUpPage = () => {
   const [name, setName] = useState("");

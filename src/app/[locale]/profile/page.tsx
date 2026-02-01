@@ -1,10 +1,10 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
+
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
 const ProfilePage = () => {
   const pathname = usePathname();

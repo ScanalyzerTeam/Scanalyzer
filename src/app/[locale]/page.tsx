@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+
+import { Link, useRouter } from "@/i18n/navigation";
 
 const HomePage = () => {
   const [email, setEmail] = useState("");
