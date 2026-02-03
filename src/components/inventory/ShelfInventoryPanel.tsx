@@ -1,10 +1,11 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Package, Plus, X } from "lucide-react";
+import { Check, Package, Pencil, Plus, X } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type {
   Item,
@@ -18,11 +19,13 @@ import { ItemTree } from "./ItemTree";
 
 interface ShelfInventoryPanelProps {
   shelf: Shelf;
+  warehouseId: string;
   onClose: () => void;
 }
 
 export function ShelfInventoryPanel({
   shelf,
+  warehouseId,
   onClose,
 }: ShelfInventoryPanelProps) {
   const queryClient = useQueryClient();
@@ -33,6 +36,8 @@ export function ShelfInventoryPanel({
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editInitialData, setEditInitialData] =
     useState<ItemFormInitialData | null>(null);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [draftName, setDraftName] = useState(shelf.name);
 
   // Fetch items for this shelf
   const { data: items = [], isLoading } = useQuery<Item[]>({
@@ -106,6 +111,37 @@ export function ShelfInventoryPanel({
     },
   });
 
+  // Update shelf name mutation
+  const updateShelfName = useMutation({
+    mutationFn: async (name: string) => {
+      const res = await fetch(`/api/shelves/${shelf.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      if (!res.ok) throw new Error("Failed to update shelf");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["warehouse", warehouseId] });
+      setIsEditingName(false);
+    },
+  });
+
+  const handleSaveName = () => {
+    if (draftName.trim() && draftName !== shelf.name) {
+      updateShelfName.mutate(draftName.trim());
+    } else {
+      setIsEditingName(false);
+      setDraftName(shelf.name);
+    }
+  };
+
+  const handleCancelNameEdit = () => {
+    setIsEditingName(false);
+    setDraftName(shelf.name);
+  };
+
   const handleAddItem = (parentId: string | null = null) => {
     setEditingItemId(null);
     setEditInitialData(null);
@@ -158,18 +194,64 @@ export function ShelfInventoryPanel({
     <div className="flex h-full w-80 shrink-0 flex-col overflow-hidden border-l border-gray-200 bg-white">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-200 p-4">
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
           <div
-            className="h-4 w-4 rounded"
+            className="h-4 w-4 shrink-0 rounded"
             style={{ backgroundColor: shelf.color }}
           />
-          <h3 className="font-semibold text-gray-900">{shelf.name}</h3>
+          {isEditingName ? (
+            <div className="flex min-w-0 flex-1 items-center gap-1 text-gray-900">
+              <Input
+                value={draftName}
+                onChange={(e) => setDraftName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSaveName();
+                  if (e.key === "Escape") handleCancelNameEdit();
+                }}
+                className="h-7 min-w-0 flex-1 text-sm"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSaveName}
+                className="h-7 w-7 shrink-0 p-0"
+                disabled={updateShelfName.isPending}
+              >
+                <Check className="h-4 w-4 text-green-600" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCancelNameEdit}
+                className="h-7 w-7 shrink-0 p-0"
+              >
+                <X className="h-4 w-4 text-gray-500" />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex min-w-0 flex-1 items-center gap-1">
+              <h3 className="min-w-0 truncate font-semibold text-gray-900">
+                {shelf.name}
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setDraftName(shelf.name);
+                  setIsEditingName(true);
+                }}
+                className="h-7 w-7 shrink-0 p-0"
+              >
+                <Pencil className="h-3 w-3 text-gray-500" />
+              </Button>
+            </div>
+          )}
         </div>
         <Button
           variant="ghost"
           size="sm"
           onClick={onClose}
-          className="h-8 w-8 p-0"
+          className="h-8 w-8 shrink-0 p-0"
         >
           <X className="h-4 w-4" />
         </Button>

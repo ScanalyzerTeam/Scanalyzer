@@ -304,6 +304,7 @@ const WarehouseMapPage = () => {
           {selectedShelf && (
             <ShelfInventoryPanel
               shelf={selectedShelf}
+              warehouseId={warehouseId}
               onClose={() => setSelectedShelfId(null)}
             />
           )}
