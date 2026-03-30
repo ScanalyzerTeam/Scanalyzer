@@ -151,9 +151,12 @@ export async function POST(request: NextRequest) {
     
     RESPONSE STRUCTURE: 
     - Summary: a brief (1-sentence) overview of the warehouse or requested item status. 
-    - Main metrics: - Current items: X 
-    - Max capacity: X - Remaining: X 
-    - Utilization: X% - Specific Details: mention only shelves relevant to the user's query or requiring attention. 
+    - Main metrics: 
+    - Current items: X 
+    - Max capacity: X 
+    - Remaining: X 
+    - Utilization: X% 
+    - Specific Details: mention only shelves relevant to the user's query or requiring attention. 
     
     - Recommendations: 
     - Combine similar suggestions (e.g., instead of listing 5 empty shelves, say "Shelves A, B, and C are empty; consider consolidating"). 
@@ -162,9 +165,11 @@ export async function POST(request: NextRequest) {
     ERROR HANDLING: 
     - If an item is missing: "I cannot find that item in your warehouse." 
     
-    
     Warehouse Data:
     ${JSON.stringify(warehousesWithCapacity, null, 2)}
+
+    Suggestions:
+    ${allSuggestions.join("\n")}
     `,
     };
 
