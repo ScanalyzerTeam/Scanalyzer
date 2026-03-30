@@ -17,13 +17,6 @@ const AIAssistantPage = () => {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "assistant",
-      content:
-        "Hello! I'm your AI warehouse assistant. How can I help you today?",
-      timestamp: new Date(),
-    },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -50,50 +43,44 @@ const AIAssistantPage = () => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
       content: input,
       timestamp: new Date(),
     };
-
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const assistantResponses: { [key: string]: string } = {
-        zone: "Zone A currently contains 342 items across 8 categories. The main categories are electronics, tools, and office supplies.",
-        scan: "I can help you with scanning items. We have 143 items scanned today with 94% efficiency rate.",
-        warehouse:
-          "The warehouse is operating at full capacity with 8 active zones. All systems are running smoothly.",
-        default:
-          "I'm here to help with warehouse management questions. Ask me about zones, scans, items, or warehouse status.",
-      };
+    try {
+      const res = await fetch("/api/ai", {
+        // your route path
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: input }),
+      });
 
-      const response =
-        assistantResponses[
-          input.toLowerCase().includes("zone")
-            ? "zone"
-            : input.toLowerCase().includes("scan")
-              ? "scan"
-              : input.toLowerCase().includes("warehouse")
-                ? "warehouse"
-                : "default"
-        ];
-
+      const data = await res.json();
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: response,
+        content: data.response || "Sorry, I could not answer that.",
         timestamp: new Date(),
       };
-
       setMessages((prev) => [...prev, assistantMessage]);
+    } catch (err) {
+      console.error(err);
+      const errorMessage: Message = {
+        id: (Date.now() + 2).toString(),
+        role: "assistant",
+        content: "Error: Unable to reach AI service.",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   const menuItems = [
@@ -213,7 +200,7 @@ const AIAssistantPage = () => {
                     : "rounded-bl-none bg-gray-100 text-gray-900"
                 }`}
               >
-                <p className="text-sm">{message.content}</p>
+                <p className="text-sm text-sm whitespace-pre-wrap">{message.content}</p>
                 {mounted && (
                   <span
                     className={`mt-1 block text-xs ${
