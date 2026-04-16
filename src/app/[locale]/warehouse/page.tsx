@@ -29,6 +29,8 @@ import type { Warehouse } from "@/lib/warehouse/types";
 interface WarehouseWithStats extends Warehouse {
   shelfCount: number;
   itemCount: number;
+  capacityUtilization: number;
+  maxCapacity: number;
 }
 
 const WarehousePage = () => {
@@ -313,20 +315,14 @@ const WarehousePage = () => {
                       <div className="mb-1 flex items-center justify-between text-xs">
                         <span className="text-gray-500">Capacity</span>
                         <span className="font-medium text-gray-700">
-                          {Math.min(
-                            100,
-                            Math.round(
-                              ((warehouse.shelfCount || 0) / 10) * 100,
-                            ),
-                          )}
-                          %
+                          {Math.min(100, warehouse.capacityUtilization || 0)}%
                         </span>
                       </div>
                       <div className="h-2 overflow-hidden rounded-full bg-gray-100">
                         <div
                           className="h-full rounded-full bg-[#FFC107] transition-all"
                           style={{
-                            width: `${Math.min(100, Math.round(((warehouse.shelfCount || 0) / 10) * 100))}%`,
+                            width: `${Math.min(100, warehouse.capacityUtilization || 0)}%`,
                           }}
                         />
                       </div>

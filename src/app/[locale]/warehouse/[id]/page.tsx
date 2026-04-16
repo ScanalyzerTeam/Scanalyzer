@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Warehouse as WarehouseIcon } from "lucide-react";
+import { ArrowLeft, Warehouse as WarehouseIcon, X } from "lucide-react";
 import { useParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
@@ -24,6 +24,7 @@ const WarehouseMapPage = () => {
   const [selectedShelfId, setSelectedShelfId] = useState<string | null>(null);
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
@@ -65,11 +66,18 @@ const WarehouseMapPage = () => {
           positionY: 100 + (shelfNumber - 1) * 20,
         }),
       });
-      if (!res.ok) throw new Error("Failed to create shelf");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to create shelf");
+      }
       return res.json();
     },
     onSuccess: () => {
+      setError(null);
       queryClient.invalidateQueries({ queryKey: ["warehouse", warehouseId] });
+    },
+    onError: (error: Error) => {
+      setError(error.message);
     },
   });
 
@@ -240,6 +248,21 @@ const WarehouseMapPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Error Alert */}
+        {error && (
+          <div className="border-b border-red-200 bg-red-50 p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-red-800">{error}</p>
+              <button
+                onClick={() => setError(null)}
+                className="text-red-600 hover:text-red-800"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Content Area */}
         <div className="flex flex-1 overflow-hidden">

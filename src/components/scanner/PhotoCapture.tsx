@@ -35,16 +35,33 @@ function resizeImage(file: File, maxSize: number): Promise<string> {
 
 interface PhotoCaptureProps {
   onCapture: (dataUrl: string) => void;
+  onError?: (error: string) => void;
 }
 
-export function PhotoCapture({ onCapture }: PhotoCaptureProps) {
+export function PhotoCapture({ onCapture, onError }: PhotoCaptureProps) {
   const cameraRef = useRef<HTMLInputElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
 
   const handleFile = async (file: File | undefined) => {
     if (!file) return;
-    const dataUrl = await resizeImage(file, 1920);
-    onCapture(dataUrl);
+
+    // Validate file format
+    const validFormats = ["image/jpeg", "image/png", "image/jpg"];
+    if (!validFormats.includes(file.type)) {
+      onError?.("Invalid file format. Please upload an image (JPG/PNG)");
+      return;
+    }
+
+    try {
+      const dataUrl = await resizeImage(file, 1920);
+      onCapture(dataUrl);
+    } catch (error) {
+      onError?.(
+        error instanceof Error
+          ? error.message
+          : "Failed to process image",
+      );
+    }
   };
 
   return (

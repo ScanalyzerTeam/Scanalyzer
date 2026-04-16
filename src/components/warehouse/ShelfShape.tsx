@@ -36,6 +36,12 @@ export function ShelfShape({
     });
   };
 
+  // Calculate font size proportionally based on shelf dimensions
+  const fontSize = Math.max(
+    10,
+    Math.min(shelf.width, shelf.depth) * 0.25,
+  );
+
   return (
     <Group
       id={`shelf-${shelf.id}`}
@@ -64,7 +70,7 @@ export function ShelfShape({
       />
       <Text
         text={shelf.name}
-        fontSize={14}
+        fontSize={fontSize}
         fontStyle="bold"
         fill="#ffffff"
         width={shelf.width}

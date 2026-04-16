@@ -1,4 +1,3 @@
-// Capacity management utilities - all calculated in code, no database storage
 
 export const CAPACITY_LIMITS = {
   WAREHOUSE_SMALL: 1000,
@@ -11,9 +10,7 @@ export const CAPACITY_LIMITS = {
   SHELF_DEFAULT: 250,
 } as const;
 
-/**
- * Basic item shape
- */
+
 type ShelfItem = {
   quantity?: number;
   [key: string]: unknown;
@@ -42,16 +39,12 @@ type WarehouseCapacity = {
   shelves: ShelfCapacity[];
 };
 
-/**
- * Calculate current item count for a shelf
- */
+
 export function calculateShelfItemCount(shelfItems: ShelfItem[]): number {
   return shelfItems.reduce((total, item) => total + (item.quantity || 1), 0);
 }
 
-/**
- * Calculate capacity info for a shelf
- */
+
 export function getShelfCapacity(
   shelfName: string,
   items: ShelfItem[],
@@ -70,9 +63,7 @@ export function getShelfCapacity(
   };
 }
 
-/**
- * Calculate capacity info for entire warehouse
- */
+
 export function getWarehouseCapacity(
   warehouseName: string,
   sheaves: Shelf[],
@@ -112,13 +103,9 @@ export function getWarehouseCapacity(
   };
 }
 
-/**
- * Generate capacity suggestions based on utilization
- */
 export function getCapacitySuggestions(
   utilizationPercent: number,
   entityName: string,
-  entityType: "warehouse" | "shelf" = "shelf",
 ): string[] {
   const suggestions: string[] = [];
 

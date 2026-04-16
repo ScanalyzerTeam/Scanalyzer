@@ -38,6 +38,7 @@ export function ShelfInventoryPanel({
     useState<ItemFormInitialData | null>(null);
   const [isEditingName, setIsEditingName] = useState(false);
   const [draftName, setDraftName] = useState(shelf.name);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch items for this shelf
   const { data: items = [], isLoading } = useQuery<Item[]>({
@@ -67,11 +68,18 @@ export function ShelfInventoryPanel({
           ...data,
         }),
       });
-      if (!res.ok) throw new Error("Failed to create item");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to create item");
+      }
       return res.json();
     },
     onSuccess: () => {
+      setError(null);
       queryClient.invalidateQueries({ queryKey: ["items", shelf.id] });
+    },
+    onError: (error: Error) => {
+      setError(error.message);
     },
   });
 
@@ -214,7 +222,7 @@ export function ShelfInventoryPanel({
                 variant="ghost"
                 size="sm"
                 onClick={handleSaveName}
-                className="h-7 w-7 shrink-0 p-0"
+                className="h-7 w-7 shrink-0 p-0 hover:bg-green-100 hover:shadow-sm"
                 disabled={updateShelfName.isPending}
               >
                 <Check className="h-4 w-4 text-green-600" />
@@ -223,7 +231,7 @@ export function ShelfInventoryPanel({
                 variant="ghost"
                 size="sm"
                 onClick={handleCancelNameEdit}
-                className="h-7 w-7 shrink-0 p-0"
+                className="h-7 w-7 shrink-0 p-0 hover:bg-gray-200 hover:shadow-sm"
               >
                 <X className="h-4 w-4 text-gray-500" />
               </Button>
@@ -240,7 +248,7 @@ export function ShelfInventoryPanel({
                   setDraftName(shelf.name);
                   setIsEditingName(true);
                 }}
-                className="h-7 w-7 shrink-0 p-0"
+                className="h-7 w-7 shrink-0 p-0 hover:bg-gray-200 hover:shadow-sm"
               >
                 <Pencil className="h-3 w-3 text-gray-500" />
               </Button>
@@ -251,7 +259,7 @@ export function ShelfInventoryPanel({
           variant="ghost"
           size="sm"
           onClick={onClose}
-          className="h-8 w-8 shrink-0 p-0"
+          className="h-8 w-8 shrink-0 p-0 hover:bg-gray-200 hover:shadow-sm text-gray-500"
         >
           <X className="h-4 w-4" />
         </Button>
@@ -282,6 +290,23 @@ export function ShelfInventoryPanel({
           Add Item
         </Button>
       </div>
+
+      {/* Error Alert */}
+      {error && (
+        <div className="border-b border-red-200 bg-red-50 p-3">
+          <div className="flex items-start gap-2">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-red-800">{error}</p>
+            </div>
+            <button
+              onClick={() => setError(null)}
+              className="shrink-0 text-red-600 hover:text-red-800"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Items Tree */}
       <ScrollArea className="flex-1 p-4">

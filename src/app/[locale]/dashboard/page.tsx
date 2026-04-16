@@ -126,7 +126,36 @@ const DashboardPage = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {totalItems === 0 ? (
+          <div className="mb-8 rounded-xl bg-white p-12 shadow-sm">
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <svg
+                className="mb-4 h-16 w-16 text-gray-300"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+              </svg>
+              <h3 className="mb-2 text-xl font-semibold text-gray-700">
+                No items yet
+              </h3>
+              <p className="mb-6 text-gray-500">
+                Start by creating a warehouse zone and adding items to your inventory.
+              </p>
+              <Link
+                href="/warehouse"
+                className="rounded-lg bg-[#FFC107] px-6 py-2 font-medium text-black transition hover:bg-[#FFD54F]"
+              >
+                Go to Warehouse
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {/* Total Items */}
           <div className="rounded-xl bg-white p-6 shadow-sm">
             <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
@@ -194,6 +223,7 @@ const DashboardPage = () => {
             <div className="text-sm text-gray-600">Active Zones</div>
           </div>
         </div>
+        )}
 
         {/* Action Cards */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
