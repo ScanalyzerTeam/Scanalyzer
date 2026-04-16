@@ -105,7 +105,7 @@ export function getCapacitySuggestions(
 ): string[] {
   const suggestions: string[] = [];
   const typeLabel = entityType === "warehouse" ? "Warehouse" : "Shelf";
- 
+
   if (utilizationPercent >= 90) {
     suggestions.push(
       `⚠️ ${typeLabel} "${entityName}" is at ${utilizationPercent}% capacity. Consider reorganizing or expanding.`,
