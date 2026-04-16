@@ -239,7 +239,7 @@ const ScannerPage = () => {
           {/* CAPTURE STATE */}
           {state === "capture" && (
             <div className="rounded-xl bg-white p-8 shadow-sm">
-              <PhotoCapture onCapture={handleCapture} />
+              <PhotoCapture onCapture={handleCapture} onError={setError} />
               {error && (
                 <div className="mt-4 rounded-lg bg-red-50 p-3 text-center text-sm text-red-600">
                   {error}

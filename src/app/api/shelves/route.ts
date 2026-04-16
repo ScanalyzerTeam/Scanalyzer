@@ -2,7 +2,8 @@ import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
-import { db, shelves, warehouses } from "@/lib/schema";
+import { CAPACITY_LIMITS } from "@/lib/capacity";
+import { db, items, shelves, warehouses } from "@/lib/schema";
 
 // GET - List all shelves for a warehouse
 export async function GET(request: Request) {
@@ -97,6 +98,32 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Warehouse not found" },
         { status: 404 },
+      );
+    }
+
+    // Check warehouse capacity
+    const allWarehouseItems = await db
+      .select({ quantity: items.quantity })
+      .from(items)
+      .innerJoin(shelves, eq(items.shelfId, shelves.id))
+      .where(eq(shelves.warehouseId, warehouseId));
+
+    const totalCurrentItems = allWarehouseItems.reduce(
+      (sum, item) => sum + (item.quantity || 1),
+      0,
+    );
+    const maxCapacity = CAPACITY_LIMITS.WAREHOUSE_DEFAULT;
+    const utilizationPercent = Math.round(
+      (totalCurrentItems / maxCapacity) * 100,
+    );
+
+    if (utilizationPercent >= 100) {
+      return NextResponse.json(
+        {
+          error: "Warehouse is at full capacity. No more shelves can be added.",
+          code: "CAPACITY_FULL",
+        },
+        { status: 400 },
       );
     }
 
