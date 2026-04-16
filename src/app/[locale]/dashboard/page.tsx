@@ -144,7 +144,8 @@ const DashboardPage = () => {
                 No items yet
               </h3>
               <p className="mb-6 text-gray-500">
-                Start by creating a warehouse zone and adding items to your inventory.
+                Start by creating a warehouse zone and adding items to your
+                inventory.
               </p>
               <Link
                 href="/warehouse"
@@ -156,73 +157,73 @@ const DashboardPage = () => {
           </div>
         ) : (
           <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Total Items */}
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
-              <svg
-                className="h-5 w-5 text-gray-600"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-              </svg>
+            {/* Total Items */}
+            <div className="rounded-xl bg-white p-6 shadow-sm">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
+                <svg
+                  className="h-5 w-5 text-gray-600"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                </svg>
+              </div>
+              <div className="text-2xl font-bold text-black">
+                {totalItems !== null ? totalItems.toLocaleString() : "—"}
+              </div>
+              <div className="text-sm text-gray-600">Total Items</div>
             </div>
-            <div className="text-2xl font-bold text-black">
-              {totalItems !== null ? totalItems.toLocaleString() : "—"}
-            </div>
-            <div className="text-sm text-gray-600">Total Items</div>
-          </div>
 
-          {/* Scanned Today */}
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
-              <svg
-                className="h-5 w-5 text-gray-600"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M2 9a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3" />
-                <path d="M2 9v10a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V9" />
-                <path d="M10 13h4" />
-              </svg>
+            {/* Scanned Today */}
+            <div className="rounded-xl bg-white p-6 shadow-sm">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
+                <svg
+                  className="h-5 w-5 text-gray-600"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M2 9a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3" />
+                  <path d="M2 9v10a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V9" />
+                  <path d="M10 13h4" />
+                </svg>
+              </div>
+              <div className="text-2xl font-bold text-black">
+                {scansToday ? scansToday.count : "—"}
+              </div>
+              <div className="text-sm text-gray-600">Scanned Today</div>
             </div>
-            <div className="text-2xl font-bold text-black">
-              {scansToday ? scansToday.count : "—"}
-            </div>
-            <div className="text-sm text-gray-600">Scanned Today</div>
-          </div>
 
-          {/* Active Zones */}
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
-              <svg
-                className="h-5 w-5 text-gray-600"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="12" y1="20" x2="12" y2="10" />
-                <line x1="18" y1="20" x2="18" y2="4" />
-                <line x1="6" y1="20" x2="6" y2="16" />
-              </svg>
+            {/* Active Zones */}
+            <div className="rounded-xl bg-white p-6 shadow-sm">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
+                <svg
+                  className="h-5 w-5 text-gray-600"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="12" y1="20" x2="12" y2="10" />
+                  <line x1="18" y1="20" x2="18" y2="4" />
+                  <line x1="6" y1="20" x2="6" y2="16" />
+                </svg>
+              </div>
+              <div className="text-2xl font-bold text-black">
+                {activeZones !== null ? activeZones : "—"}
+              </div>
+              <div className="text-sm text-gray-600">Active Zones</div>
             </div>
-            <div className="text-2xl font-bold text-black">
-              {activeZones !== null ? activeZones : "—"}
-            </div>
-            <div className="text-sm text-gray-600">Active Zones</div>
           </div>
-        </div>
         )}
 
         {/* Action Cards */}

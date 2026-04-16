@@ -37,10 +37,7 @@ export function ShelfShape({
   };
 
   // Calculate font size proportionally based on shelf dimensions
-  const fontSize = Math.max(
-    10,
-    Math.min(shelf.width, shelf.depth) * 0.25,
-  );
+  const fontSize = Math.max(10, Math.min(shelf.width, shelf.depth) * 0.25);
 
   return (
     <Group

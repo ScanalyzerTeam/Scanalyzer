@@ -57,9 +57,7 @@ export function PhotoCapture({ onCapture, onError }: PhotoCaptureProps) {
       onCapture(dataUrl);
     } catch (error) {
       onError?.(
-        error instanceof Error
-          ? error.message
-          : "Failed to process image",
+        error instanceof Error ? error.message : "Failed to process image",
       );
     }
   };

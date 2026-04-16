@@ -1,4 +1,3 @@
-
 export const CAPACITY_LIMITS = {
   WAREHOUSE_SMALL: 1000,
   SHELF_SMALL: 100,
@@ -9,7 +8,6 @@ export const CAPACITY_LIMITS = {
   WAREHOUSE_DEFAULT: 3000,
   SHELF_DEFAULT: 250,
 } as const;
-
 
 type ShelfItem = {
   quantity?: number;
@@ -39,11 +37,9 @@ type WarehouseCapacity = {
   shelves: ShelfCapacity[];
 };
 
-
 export function calculateShelfItemCount(shelfItems: ShelfItem[]): number {
   return shelfItems.reduce((total, item) => total + (item.quantity || 1), 0);
 }
-
 
 export function getShelfCapacity(
   shelfName: string,
@@ -62,7 +58,6 @@ export function getShelfCapacity(
     utilizationPercent,
   };
 }
-
 
 export function getWarehouseCapacity(
   warehouseName: string,

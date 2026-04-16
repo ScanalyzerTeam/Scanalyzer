@@ -123,7 +123,9 @@ export async function POST(request: Request) {
       0,
     );
     const maxCapacity = CAPACITY_LIMITS.WAREHOUSE_DEFAULT;
-    const utilizationPercent = Math.round((totalCurrentItems / maxCapacity) * 100);
+    const utilizationPercent = Math.round(
+      (totalCurrentItems / maxCapacity) * 100,
+    );
 
     if (utilizationPercent >= 100) {
       return NextResponse.json(
