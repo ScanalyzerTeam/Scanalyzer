@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 
-import { LangSwitcher } from "@/components/lang-switcher";
 import { QueryProvider } from "@/components/query-provider";
 import { AuthSessionProvider } from "@/components/session-provider";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -71,7 +70,6 @@ const RootLayout = async ({
                 forcedTheme="dark"
               >
                 {children}
-                <LangSwitcher className="absolute right-5 bottom-5 z-10" />
               </ThemeProvider>
             </NextIntlClientProvider>
           </QueryProvider>
