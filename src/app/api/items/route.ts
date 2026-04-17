@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
+import { CAPACITY_LIMITS } from "@/lib/capacity";
 import { db, items, shelves, warehouses } from "@/lib/schema";
 
 // GET - List all items for a shelf
@@ -108,6 +109,32 @@ export async function POST(request: Request) {
 
     if (!warehouse) {
       return NextResponse.json({ error: "Shelf not found" }, { status: 404 });
+    }
+
+    // Check warehouse capacity
+    const allWarehouseItems = await db
+      .select({ quantity: items.quantity })
+      .from(items)
+      .innerJoin(shelves, eq(items.shelfId, shelves.id))
+      .where(eq(shelves.warehouseId, warehouse.id));
+
+    const totalCurrentItems = allWarehouseItems.reduce(
+      (sum, item) => sum + (item.quantity || 1),
+      0,
+    );
+    const maxCapacity = CAPACITY_LIMITS.WAREHOUSE_DEFAULT;
+    const utilizationPercent = Math.round(
+      (totalCurrentItems / maxCapacity) * 100,
+    );
+
+    if (utilizationPercent >= 100) {
+      return NextResponse.json(
+        {
+          error: "Warehouse is at full capacity. No more items can be added.",
+          code: "CAPACITY_FULL",
+        },
+        { status: 400 },
+      );
     }
 
     // Calculate path and depth based on parent

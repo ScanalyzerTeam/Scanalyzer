@@ -2,6 +2,7 @@ import { count, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
+import { CAPACITY_LIMITS } from "@/lib/capacity";
 import { db, items, shelves, warehouses } from "@/lib/schema";
 
 const MAX_WAREHOUSES_PER_USER = 3;
@@ -27,16 +28,26 @@ export async function GET() {
           .from(shelves)
           .where(eq(shelves.warehouseId, warehouse.id));
 
-        const [itemCountResult] = await db
-          .select({ count: count() })
+        const itemsData = await db
+          .select({ quantity: items.quantity })
           .from(items)
           .innerJoin(shelves, eq(items.shelfId, shelves.id))
           .where(eq(shelves.warehouseId, warehouse.id));
 
+        const shelfCount = shelfCountResult?.count || 0;
+        const totalItems = itemsData.reduce(
+          (sum, item) => sum + (item.quantity || 1),
+          0,
+        );
+        const maxCapacity = CAPACITY_LIMITS.WAREHOUSE_DEFAULT;
+        const utilizationPercent = Math.round((totalItems / maxCapacity) * 100);
+
         return {
           ...warehouse,
-          shelfCount: shelfCountResult?.count || 0,
-          itemCount: itemCountResult?.count || 0,
+          shelfCount,
+          itemCount: totalItems,
+          capacityUtilization: utilizationPercent,
+          maxCapacity,
         };
       }),
     );

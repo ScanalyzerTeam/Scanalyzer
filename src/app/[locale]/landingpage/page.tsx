@@ -112,7 +112,16 @@ const LandingPage = () => {
           Sign up now and take control of your warehouse with our AI-powered
           system.
         </p>
+<<<<<<< HEAD
         <Link href="/signup">Get Started</Link>
+=======
+        <Link
+          href="/signup"
+          className="bg-black text-[#FFC107] px-6 py-3 rounded-lg font-semibold hover:bg-gray-900 transition"
+        >
+          Get Started
+        </Link>
+>>>>>>> ccd7804f01ac38d82c35a79b83d911f5ce9f2e1a
       </section>
     </div>
   );
