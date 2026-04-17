@@ -18,7 +18,7 @@ export default function Page() {
 
   // Show nothing while checking (or a loading spinner)
   if (status === "loading") {
-    return <div className="min-h-screen bg-[#1a1d2e]" />; 
+    return <div className="min-h-screen bg-[#1a1d2e]" />;
   }
 
   // If not logged in, show the Landing Page
