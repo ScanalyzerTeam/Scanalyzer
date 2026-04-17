@@ -109,9 +109,12 @@ const LandingPage = () => {
         <p className="text-black mb-6">
           Sign up now and take control of your warehouse with our AI-powered system.
         </p>
-        <Link href="/signup">
-  Get Started
-</Link>
+        <Link
+          href="/signup"
+          className="bg-black text-[#FFC107] px-6 py-3 rounded-lg font-semibold hover:bg-gray-900 transition"
+        >
+          Get Started
+        </Link>
       </section>
     </div>
   );
