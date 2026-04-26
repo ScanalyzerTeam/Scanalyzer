@@ -2,6 +2,7 @@
 
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+
 import { Link, useRouter } from "@/i18n/navigation";
 
 const SignInPage = () => {
@@ -31,7 +32,7 @@ const SignInPage = () => {
 
       // Redirect to dashboard on success
       router.push("/dashboard");
-    } catch (err) {
+    } catch {
       setError("An error occurred. Please try again.");
       setLoading(false);
     }
@@ -72,9 +73,7 @@ const SignInPage = () => {
           <div className="flex flex-col justify-center bg-[#f5f5f5] p-12 md:p-16">
             <div className="mx-auto w-full max-w-sm">
               <div className="mb-8">
-                <h2 className="mb-2 text-3xl font-bold text-black">
-                  Sign In
-                </h2>
+                <h2 className="mb-2 text-3xl font-bold text-black">Sign In</h2>
                 <p className="text-sm text-gray-600">
                   Welcome back! Please enter your details.
                 </p>
@@ -89,7 +88,10 @@ const SignInPage = () => {
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Email Field */}
                 <div>
-                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-black">
+                  <label
+                    htmlFor="email"
+                    className="mb-2 block text-sm font-medium text-black"
+                  >
                     Email
                   </label>
                   <input
@@ -105,7 +107,10 @@ const SignInPage = () => {
 
                 {/* Password Field */}
                 <div>
-                  <label htmlFor="password" className="mb-2 block text-sm font-medium text-black">
+                  <label
+                    htmlFor="password"
+                    className="mb-2 block text-sm font-medium text-black"
+                  >
                     Password
                   </label>
                   <input
@@ -129,7 +134,7 @@ const SignInPage = () => {
               </form>
 
               <p className="mt-6 text-center text-sm text-gray-600">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Link
                   href="/signup"
                   className="font-medium text-[#FFC107] transition hover:text-[#FFB300]"
