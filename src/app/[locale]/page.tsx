@@ -2,7 +2,9 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
+
 import { useRouter } from "@/i18n/navigation";
+
 import LandingPage from "./landingpage/page";
 
 export default function Page() {

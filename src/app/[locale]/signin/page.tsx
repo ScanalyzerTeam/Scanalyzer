@@ -2,6 +2,7 @@
 
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+
 import { Link, useRouter } from "@/i18n/navigation";
 
 const SignInPage = () => {
@@ -31,7 +32,7 @@ const SignInPage = () => {
 
       // Redirect to dashboard on success
       router.push("/dashboard");
-    } catch (err) {
+    } catch {
       setError("An error occurred. Please try again.");
       setLoading(false);
     }
@@ -133,7 +134,7 @@ const SignInPage = () => {
               </form>
 
               <p className="mt-6 text-center text-sm text-gray-600">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Link
                   href="/signup"
                   className="font-medium text-[#FFC107] transition hover:text-[#FFB300]"
