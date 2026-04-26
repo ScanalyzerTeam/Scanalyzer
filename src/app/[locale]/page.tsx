@@ -1,12 +1,13 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { useEffect } from "react";
+import { useRouter } from "@/i18n/navigation";
 import LandingPage from "./landingpage/page";
-// import HomePage if you want to show login separately
-// import HomePage from "./login";
 
 export default function Page() {
   const { status } = useSession();
+  const router = useRouter();
 
   // Use useEffect to handle the redirect safely on the client side
   useEffect(() => {
