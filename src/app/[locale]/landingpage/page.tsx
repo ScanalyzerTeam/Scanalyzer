@@ -9,11 +9,11 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a1d2e] via-[#2a2d3e] to-[#1a1d2e] text-white">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-[#1a1d2e]/80 backdrop-blur-md border-b border-[#2a2d3e]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+      <nav className="fixed top-0 z-50 w-full border-b border-[#2a2d3e] bg-[#1a1d2e]/80 backdrop-blur-md">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-lg bg-[#FFC107] flex items-center justify-center">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FFC107]">
                 <svg
                   className="h-5 w-5 text-black"
                   fill="none"
@@ -33,7 +33,7 @@ const LandingPage = () => {
             <div className="flex items-center space-x-4">
               <Link
                 href="/signup"
-                className="bg-[#FFC107] text-black px-4 py-2 rounded-lg font-medium hover:bg-[#FFB300] transition"
+                className="rounded-lg bg-[#FFC107] px-4 py-2 font-medium text-black transition hover:bg-[#FFB300]"
               >
                 {t("getStartedButton")}
               </Link>
@@ -43,8 +43,8 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-20 pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
+      <section className="relative px-4 pt-20 pb-20 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl text-center">
           <h1 className="mb-6 text-4xl font-bold text-white sm:text-6xl lg:text-7xl">
             Scanalyzer
           </h1>
@@ -55,16 +55,16 @@ const LandingPage = () => {
       </section>
 
       {/* About / Info Section */}
-      <section className="bg-[#2a2d3e] py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6">About Our Project</h2>
-          <p className="text-gray-300 mb-4">
+      <section className="bg-[#2a2d3e] px-4 py-20 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-5xl text-center">
+          <h2 className="mb-6 text-3xl font-bold">About Our Project</h2>
+          <p className="mb-4 text-gray-300">
             We are a dedicated project team building an AI-powered warehouse
             system designed to make managing your inventory simple and
             intelligent. With Scanalyzer, you can create, view, and organize
             your warehouse efficiently.
           </p>
-          <p className="text-gray-300 mb-4">
+          <p className="mb-4 text-gray-300">
             Our system also features an advanced photo scanner that allows you
             to quickly capture and catalog items, making tracking your stock
             faster than ever.
@@ -78,23 +78,23 @@ const LandingPage = () => {
       </section>
 
       {/* Features / Highlight Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-          <div className="p-6 bg-[#1a1d2e] rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold mb-2">Smart Inventory</h3>
+      <section className="px-4 py-20 sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 text-center md:grid-cols-3">
+          <div className="rounded-xl bg-[#1a1d2e] p-6 shadow-lg">
+            <h3 className="mb-2 text-xl font-semibold">Smart Inventory</h3>
             <p className="text-gray-300">
               AI-powered tracking and management for all your warehouse items.
             </p>
           </div>
-          <div className="p-6 bg-[#1a1d2e] rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold mb-2">Photo Scanner</h3>
+          <div className="rounded-xl bg-[#1a1d2e] p-6 shadow-lg">
+            <h3 className="mb-2 text-xl font-semibold">Photo Scanner</h3>
             <p className="text-gray-300">
-              Quickly capture, catalog, and track items using our built-in
-              photo scanner.
+              Quickly capture, catalog, and track items using our built-in photo
+              scanner.
             </p>
           </div>
-          <div className="p-6 bg-[#1a1d2e] rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold mb-2">Analytics</h3>
+          <div className="rounded-xl bg-[#1a1d2e] p-6 shadow-lg">
+            <h3 className="mb-2 text-xl font-semibold">Analytics</h3>
             <p className="text-gray-300">
               Visualize and analyze your warehouse data to make smarter
               decisions.
@@ -104,14 +104,15 @@ const LandingPage = () => {
       </section>
 
       {/* Call to Action Section */}
-      <section className="bg-[#FFC107] py-20 px-4 sm:px-6 lg:px-8 text-center rounded-t-3xl">
-        <h2 className="text-3xl font-bold mb-6 text-black">Ready? Let&apos;s Start!</h2>
-        <p className="text-black mb-6">
-          Sign up now and take control of your warehouse with our AI-powered system.
+      <section className="rounded-t-3xl bg-[#FFC107] px-4 py-20 text-center sm:px-6 lg:px-8">
+        <h2 className="mb-6 text-3xl font-bold text-black">
+          Ready? Let&apos;s Start!
+        </h2>
+        <p className="mb-6 text-black">
+          Sign up now and take control of your warehouse with our AI-powered
+          system.
         </p>
-        <Link href="/signup">
-  Get Started
-</Link>
+        <Link href="/signup">Get Started</Link>
       </section>
     </div>
   );
