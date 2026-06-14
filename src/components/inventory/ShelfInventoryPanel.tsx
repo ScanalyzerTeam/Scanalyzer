@@ -199,7 +199,7 @@ export function ShelfInventoryPanel({
   };
 
   return (
-    <div className="flex h-full w-80 shrink-0 flex-col overflow-hidden border-l border-gray-200 bg-white">
+    <div className="flex h-full min-h-0 w-80 shrink-0 flex-col overflow-hidden border-l border-gray-200 bg-white">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-200 p-4">
         <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -309,7 +309,7 @@ export function ShelfInventoryPanel({
       )}
 
       {/* Items Tree */}
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="min-h-0 flex-1 p-4">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
             <Package className="h-6 w-6 animate-pulse text-gray-400" />

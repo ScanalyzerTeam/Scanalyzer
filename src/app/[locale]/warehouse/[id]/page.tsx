@@ -4,9 +4,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Warehouse as WarehouseIcon, X } from "lucide-react";
 import { useParams } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { ShelfInventoryPanel } from "@/components/inventory/ShelfInventoryPanel";
+import { LangSwitcher } from "@/components/lang-switcher";
 import { Button } from "@/components/ui/button";
 import { WarehouseCanvas } from "@/components/warehouse/WarehouseCanvas";
 import { WarehouseToolbar } from "@/components/warehouse/WarehouseToolbar";
@@ -17,6 +19,8 @@ const WarehouseMapPage = () => {
   const params = useParams();
   const pathname = usePathname();
   const router = useRouter();
+  const tNav = useTranslations("nav");
+  const tWarehouse = useTranslations("warehouse");
   const queryClient = useQueryClient();
   const warehouseId = params.id as string;
 
@@ -130,10 +134,7 @@ const WarehouseMapPage = () => {
   };
 
   const handleDeleteShelf = () => {
-    if (
-      selectedShelfId &&
-      confirm("Are you sure you want to delete this shelf and all its items?")
-    ) {
+    if (selectedShelfId && confirm(tWarehouse("confirmDelete"))) {
       deleteShelf.mutate(selectedShelfId);
     }
   };
@@ -181,7 +182,9 @@ const WarehouseMapPage = () => {
               <line x1="12" y1="22.08" x2="12" y2="12" />
             </svg>
           </div>
-          <span className="font-semibold text-black">AI Warehouse</span>
+          <span className="font-semibold text-black">
+            {tNav("ai-assistant")}
+          </span>
         </div>
 
         {/* Navigation */}
@@ -199,12 +202,13 @@ const WarehouseMapPage = () => {
                 }`}
               >
                 <span className="text-lg">{item.icon}</span>
-                {item.label}
+                {tNav(item.href.replace("/", ""))}
               </Link>
             );
           })}
         </nav>
 
+        <LangSwitcher />
         {/* Logout */}
         <button
           onClick={handleLogout}
@@ -223,7 +227,7 @@ const WarehouseMapPage = () => {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-          Logout
+          {tNav("logout")}
         </button>
       </aside>
 
@@ -240,11 +244,9 @@ const WarehouseMapPage = () => {
             </Link>
             <div>
               <h1 className="text-2xl font-bold text-black">
-                {warehouse?.name || "Loading..."}
+                {warehouse?.name || tWarehouse("loadingZones")}
               </h1>
-              <p className="text-gray-600">
-                Interactive 2D floor plan with shelf management
-              </p>
+              <p className="text-gray-600">{tWarehouse("subtitle")}</p>
             </div>
           </div>
         </div>
@@ -270,21 +272,23 @@ const WarehouseMapPage = () => {
           <div className="flex min-w-0 flex-1 flex-col p-6">
             {isLoading ? (
               <div className="flex flex-1 items-center justify-center">
-                <div className="animate-pulse text-gray-500">Loading...</div>
+                <div className="animate-pulse text-gray-500">
+                  {tWarehouse("loadingZones")}
+                </div>
               </div>
             ) : !warehouse ? (
               <div className="flex flex-1 flex-col items-center justify-center rounded-xl bg-white p-12">
                 <WarehouseIcon className="mb-4 h-16 w-16 text-gray-300" />
                 <h3 className="mb-2 text-xl font-semibold text-gray-700">
-                  Warehouse not found
+                  {tWarehouse("warehouseNotFound")}
                 </h3>
                 <p className="mb-6 text-gray-500">
-                  This warehouse may have been deleted or does not exist
+                  {tWarehouse("warehouseNotFoundDesc")}
                 </p>
                 <Link href="/warehouse">
                   <Button>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Zones
+                    {tWarehouse("backToZones")}
                   </Button>
                 </Link>
               </div>

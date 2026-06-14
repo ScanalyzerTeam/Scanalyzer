@@ -1,10 +1,12 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+
 import { Link } from "@/i18n/navigation";
 
 const LandingPage = () => {
   const t = useTranslations("home");
+  const tLanding = useTranslations("landing");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a1d2e] via-[#2a2d3e] to-[#1a1d2e] text-white">
@@ -28,7 +30,9 @@ const LandingPage = () => {
                   />
                 </svg>
               </div>
-              <span className="text-xl font-bold text-white">Scanalyzer</span>
+              <span className="text-xl font-bold text-white">
+                {tLanding("productName")}
+              </span>
             </div>
             <div className="flex items-center space-x-4">
               <Link
@@ -57,23 +61,10 @@ const LandingPage = () => {
       {/* About / Info Section */}
       <section className="bg-[#2a2d3e] px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl text-center">
-          <h2 className="mb-6 text-3xl font-bold">About Our Project</h2>
-          <p className="mb-4 text-gray-300">
-            We are a dedicated project team building an AI-powered warehouse
-            system designed to make managing your inventory simple and
-            intelligent. With Scanalyzer, you can create, view, and organize
-            your warehouse efficiently.
-          </p>
-          <p className="mb-4 text-gray-300">
-            Our system also features an advanced photo scanner that allows you
-            to quickly capture and catalog items, making tracking your stock
-            faster than ever.
-          </p>
-          <p className="text-gray-300">
-            Whether you are a small business or a large warehouse, our platform
-            helps you streamline operations, improve accuracy, and save time
-            while giving you full visibility over your inventory.
-          </p>
+          <h2 className="mb-6 text-3xl font-bold">{tLanding("aboutTitle")}</h2>
+          <p className="mb-4 text-gray-300">{tLanding("aboutPara1")}</p>
+          <p className="mb-4 text-gray-300">{tLanding("aboutPara2")}</p>
+          <p className="text-gray-300">{tLanding("aboutPara3")}</p>
         </div>
       </section>
 
@@ -81,23 +72,27 @@ const LandingPage = () => {
       <section className="px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 text-center md:grid-cols-3">
           <div className="rounded-xl bg-[#1a1d2e] p-6 shadow-lg">
-            <h3 className="mb-2 text-xl font-semibold">Smart Inventory</h3>
+            <h3 className="mb-2 text-xl font-semibold">
+              {tLanding("feature_smart_inventory")}
+            </h3>
             <p className="text-gray-300">
-              AI-powered tracking and management for all your warehouse items.
+              {tLanding("feature_smart_inventory_desc")}
             </p>
           </div>
           <div className="rounded-xl bg-[#1a1d2e] p-6 shadow-lg">
-            <h3 className="mb-2 text-xl font-semibold">Photo Scanner</h3>
+            <h3 className="mb-2 text-xl font-semibold">
+              {tLanding("feature_photo_scanner")}
+            </h3>
             <p className="text-gray-300">
-              Quickly capture, catalog, and track items using our built-in photo
-              scanner.
+              {tLanding("feature_photo_scanner_desc")}
             </p>
           </div>
           <div className="rounded-xl bg-[#1a1d2e] p-6 shadow-lg">
-            <h3 className="mb-2 text-xl font-semibold">Analytics</h3>
+            <h3 className="mb-2 text-xl font-semibold">
+              {tLanding("feature_analytics")}
+            </h3>
             <p className="text-gray-300">
-              Visualize and analyze your warehouse data to make smarter
-              decisions.
+              {tLanding("feature_analytics_desc")}
             </p>
           </div>
         </div>
@@ -106,13 +101,10 @@ const LandingPage = () => {
       {/* Call to Action Section */}
       <section className="rounded-t-3xl bg-[#FFC107] px-4 py-20 text-center sm:px-6 lg:px-8">
         <h2 className="mb-6 text-3xl font-bold text-black">
-          Ready? Let&apos;s Start!
+          {tLanding("cta_title")}
         </h2>
-        <p className="mb-6 text-black">
-          Sign up now and take control of your warehouse with our AI-powered
-          system.
-        </p>
-        <Link href="/signup">Get Started</Link>
+        <p className="mb-6 text-black">{tLanding("cta_desc")}</p>
+        <Link href="/signup">{tLanding("getStarted")}</Link>
       </section>
     </div>
   );

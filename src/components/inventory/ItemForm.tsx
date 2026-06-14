@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,7 @@ export function ItemForm({
   shelfName,
   initialData = null,
 }: ItemFormProps) {
+  const t = useTranslations("suggestions");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isContainer, setIsContainer] = useState(false);
@@ -86,12 +88,12 @@ export function ItemForm({
   };
 
   const title = isEditing
-    ? "Edit Item"
+    ? t("editItem")
     : parentId
-      ? "Add Item to Container"
+      ? t("addItemToContainer")
       : shelfName
-        ? `Add Item to ${shelfName}`
-        : "Add Item";
+        ? t("addItemToShelf", { shelf: shelfName })
+        : t("addItem");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -102,22 +104,24 @@ export function ItemForm({
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t("name")}</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g., Hammer, Box of Nails"
+                placeholder={t("namePlaceholder")}
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="description">Description (optional)</Label>
+              <Label htmlFor="description">
+                {t("description")} ({t("optional")})
+              </Label>
               <Input
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="e.g., 16oz claw hammer"
+                placeholder={t("descriptionPlaceholder")}
               />
             </div>
 
@@ -134,13 +138,13 @@ export function ItemForm({
                 htmlFor="isContainer"
                 className={`cursor-pointer ${isEditing ? "opacity-50" : ""}`}
               >
-                This is a container (box, bin, etc.)
+                {t("container")} ({t("containerHint")})
               </Label>
             </div>
 
             {!isContainer && (
               <div className="grid gap-2">
-                <Label htmlFor="quantity">Quantity</Label>
+                <Label htmlFor="quantity">{t("quantity")}</Label>
                 <Input
                   id="quantity"
                   type="number"
@@ -158,12 +162,14 @@ export function ItemForm({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button type="submit" disabled={!name.trim()}>
               {isEditing
-                ? "Save Changes"
-                : `Add ${isContainer ? "Container" : "Item"}`}
+                ? t("saveChanges")
+                : isContainer
+                  ? t("addContainer")
+                  : t("addItem")}
             </Button>
           </DialogFooter>
         </form>

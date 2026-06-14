@@ -5,6 +5,7 @@ import { signOut } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { LangSwitcher } from "@/components/lang-switcher";
 import { AnalyzingSpinner } from "@/components/scanner/AnalyzingSpinner";
 import { PhotoCapture } from "@/components/scanner/PhotoCapture";
 import {
@@ -21,6 +22,7 @@ const ScannerPage = () => {
   const pathname = usePathname();
   const router = useRouter();
   const t = useTranslations("scanner");
+  const tNav = useTranslations("nav");
 
   const [state, setState] = useState<ScanState>("capture");
   const [imageUrl, setImageUrl] = useState("");
@@ -57,7 +59,9 @@ const ScannerPage = () => {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "Analysis failed");
+        setError(data.error || t("analysisFailed"));
+        setState("capture");
+        return;
       }
 
       const data = await res.json();
@@ -77,7 +81,7 @@ const ScannerPage = () => {
       setItems(suggestions);
       setState("review");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Analysis failed");
+      setError(err instanceof Error ? err.message : t("analysisFailed"));
       setState("capture");
     }
   };
@@ -184,7 +188,9 @@ const ScannerPage = () => {
               <line x1="12" y1="22.08" x2="12" y2="12" />
             </svg>
           </div>
-          <span className="font-semibold text-black">AI Warehouse</span>
+          <span className="font-semibold text-black">
+            {tNav("ai-assistant")}
+          </span>
         </div>
 
         <nav className="flex-1 space-y-2">
@@ -201,11 +207,13 @@ const ScannerPage = () => {
                 }`}
               >
                 <span className="text-lg">{item.icon}</span>
-                {item.label}
+                {tNav(item.href.replace("/", ""))}
               </Link>
             );
           })}
         </nav>
+
+        <LangSwitcher />
 
         <button
           onClick={handleLogout}
@@ -224,7 +232,7 @@ const ScannerPage = () => {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-          Logout
+          {tNav("logout")}
         </button>
       </aside>
 
@@ -264,7 +272,7 @@ const ScannerPage = () => {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={imageUrl}
-                    alt="Scanned"
+                    alt={t("capturedAlt")}
                     className="h-20 w-20 rounded-lg object-cover"
                   />
                   <div>

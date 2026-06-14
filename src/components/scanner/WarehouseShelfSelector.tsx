@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 interface Warehouse {
   id: string;
@@ -25,6 +26,7 @@ export function WarehouseShelfSelector({
   onWarehouseChange,
   onShelfChange,
 }: WarehouseShelfSelectorProps) {
+  const t = useTranslations("scanner");
   const { data: warehouses = [], isLoading: loadingWarehouses } = useQuery<
     Warehouse[]
   >({
@@ -53,7 +55,7 @@ export function WarehouseShelfSelector({
           htmlFor="scanner-warehouse"
           className="mb-1 block text-xs font-medium text-gray-500"
         >
-          Warehouse
+          {t("warehouseLabel")}
         </label>
         <select
           id="scanner-warehouse"
@@ -65,7 +67,7 @@ export function WarehouseShelfSelector({
           disabled={loadingWarehouses}
           className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-black focus:border-[#FFC107] focus:ring-1 focus:ring-[#FFC107] focus:outline-none"
         >
-          <option value="">Select warehouse...</option>
+          <option value="">{t("selectWarehouse")}</option>
           {warehouses.map((w) => (
             <option key={w.id} value={w.id}>
               {w.name}
@@ -79,7 +81,7 @@ export function WarehouseShelfSelector({
           htmlFor="scanner-shelf"
           className="mb-1 block text-xs font-medium text-gray-500"
         >
-          Shelf
+          {t("shelfLabel")}
         </label>
         <select
           id="scanner-shelf"
@@ -90,10 +92,10 @@ export function WarehouseShelfSelector({
         >
           <option value="">
             {!warehouseId
-              ? "Select warehouse first..."
+              ? t("selectWarehouseFirst")
               : loadingShelves
-                ? "Loading..."
-                : "Select shelf..."}
+                ? t("loading")
+                : t("selectShelf")}
           </option>
           {shelves.map((s) => (
             <option key={s.id} value={s.id}>

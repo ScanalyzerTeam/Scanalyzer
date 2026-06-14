@@ -1,6 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
+import React from "react";
 
 import type { Shelf, Warehouse } from "@/lib/warehouse/types";
 
@@ -9,11 +11,17 @@ const KonvaCanvas = dynamic(
   () => import("./KonvaCanvas").then((mod) => mod.KonvaCanvas),
   {
     ssr: false,
-    loading: () => (
-      <div className="flex h-full w-full items-center justify-center bg-gray-50">
-        <div className="text-gray-500">Loading canvas...</div>
-      </div>
-    ),
+    loading: () => {
+      const Loader = () => {
+        const t = useTranslations("warehouse");
+        return (
+          <div className="flex h-full w-full items-center justify-center bg-gray-50">
+            <div className="text-gray-500">{t("loading")}</div>
+          </div>
+        );
+      };
+      return <Loader />;
+    },
   },
 );
 
