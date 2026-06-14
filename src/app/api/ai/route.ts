@@ -72,20 +72,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const warehouseData = await getWarehouseContext(session.user.id);
-
-  // Quick command parsing: allow simple create commands from the assistant UI.
-  // Supported commands (simple formats):
-  // - create warehouse name=Main width=800 height=600
-  // - create shelf warehouseId=<id>|warehouseName="Main" name=ShelfA positionX=100
-  // - create item shelfId=<id>|shelfName="ShelfA" name=ItemA quantity=5
-  // If required fields are missing, return a clear message listing missing fields.
   const tryHandleCreateCommand = async (text: string) => {
     const normalized = text.trim();
 
     const parseKVs = (s: string) => {
       const kv: Record<string, string> = {};
-      const re = /([a-zA-Z0-9_]+)=((?:\"[^\"]+\")|(?:'[^']+')|(?:[^\\s]+))/g;
+      const re = /([a-zA-Z0-9_]+)=((?:\"[^\"]+\")|(?:'[^']+')|(?:[^\s]+))/g;
       let m;
       while ((m = re.exec(s))) {
         let val = m[2];
@@ -374,7 +366,9 @@ export async function POST(request: NextRequest) {
     // fall through to AI
   }
 
-  // Calculate capacity info
+  // Only fetch warehouse context when we actually need it for the AI
+  const warehouseData = await getWarehouseContext(session.user.id);
+
   const warehousesWithCapacity = warehouseData.map((w) => {
     const warehouseCapacity = getWarehouseCapacity(w.name, w.shelves);
 
@@ -398,7 +392,6 @@ export async function POST(request: NextRequest) {
     };
   });
 
-  // Generate suggestions
   const allSuggestions: string[] = [];
 
   for (const warehouse of warehousesWithCapacity) {
@@ -495,7 +488,6 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error("OpenAI Error:", error);
-
     return NextResponse.json(
       { error: "AI request failed or timed out" },
       { status: 500 },
