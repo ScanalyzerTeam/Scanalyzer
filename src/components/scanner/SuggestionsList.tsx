@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Package, Trash2 } from "lucide-react";
+import { Package, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export interface SuggestedItem {
@@ -181,13 +181,14 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
 
             {/* Container toggle */}
             <div className="col-span-6 flex items-end pb-0.5 sm:col-span-1">
-              <label className="flex cursor-pointer flex-col items-center gap-1">
+              <div className="flex cursor-pointer flex-col items-center gap-1">
                 <span className="text-xs font-medium text-gray-400">
                   {t("container")}
                 </span>
                 <button
                   type="button"
                   role="switch"
+                  aria-label={t("container")}
                   aria-checked={item.isContainer}
                   onClick={() =>
                     updateItem(originalIndex, {
@@ -204,7 +205,7 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
                     }`}
                   />
                 </button>
-              </label>
+              </div>
             </div>
 
             {/* Inside container */}
