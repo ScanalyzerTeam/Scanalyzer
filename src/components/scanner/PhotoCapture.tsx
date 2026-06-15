@@ -1,6 +1,7 @@
 "use client";
 
 import { Camera, Upload } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRef } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,7 @@ interface PhotoCaptureProps {
 }
 
 export function PhotoCapture({ onCapture, onError }: PhotoCaptureProps) {
+  const t = useTranslations("scanner");
   const cameraRef = useRef<HTMLInputElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
 
@@ -48,7 +50,7 @@ export function PhotoCapture({ onCapture, onError }: PhotoCaptureProps) {
     // Validate file format
     const validFormats = ["image/jpeg", "image/png", "image/jpg"];
     if (!validFormats.includes(file.type)) {
-      onError?.("Invalid file format. Please upload an image (JPG/PNG)");
+      onError?.(t("invalidFileFormat"));
       return;
     }
 
@@ -57,7 +59,7 @@ export function PhotoCapture({ onCapture, onError }: PhotoCaptureProps) {
       onCapture(dataUrl);
     } catch (error) {
       onError?.(
-        error instanceof Error ? error.message : "Failed to process image",
+        error instanceof Error ? error.message : t("failedProcessImage"),
       );
     }
   };
@@ -67,9 +69,7 @@ export function PhotoCapture({ onCapture, onError }: PhotoCaptureProps) {
       <div className="flex h-56 w-full max-w-md items-center justify-center rounded-xl border-2 border-dashed border-gray-300">
         <div className="text-center">
           <Camera className="mx-auto mb-3 h-12 w-12 text-gray-400" />
-          <p className="text-sm text-gray-500">
-            Take a photo or upload an image of items
-          </p>
+          <p className="text-sm text-gray-500">{t("takePhotoHint")}</p>
         </div>
       </div>
 
@@ -79,7 +79,7 @@ export function PhotoCapture({ onCapture, onError }: PhotoCaptureProps) {
           className="bg-[#FFC107] text-black hover:bg-[#FFB300]"
         >
           <Camera className="mr-2 h-4 w-4" />
-          Take Photo
+          {t("takePhoto")}
         </Button>
         <Button
           variant="outline"
@@ -87,7 +87,7 @@ export function PhotoCapture({ onCapture, onError }: PhotoCaptureProps) {
           className="border-gray-300 text-black"
         >
           <Upload className="mr-2 h-4 w-4" />
-          Upload Photo
+          {t("uploadPhoto")}
         </Button>
       </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { Package, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +20,7 @@ interface SuggestionsListProps {
 }
 
 export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
+  const t = useTranslations("suggestions");
   const updateItem = (index: number, updates: Partial<SuggestedItem>) => {
     const next = items.map((item, i) =>
       i === index ? { ...item, ...updates } : item,
@@ -41,9 +43,7 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
 
   if (items.length === 0) {
     return (
-      <p className="py-4 text-center text-sm text-gray-500">
-        No items detected
-      </p>
+      <p className="py-4 text-center text-sm text-gray-500">{t("noItems")}</p>
     );
   }
 
@@ -96,11 +96,13 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
                   }
                   className="accent-[#FFC107]"
                 />
-                <span className="font-medium text-gray-700">Include</span>
+                <span className="font-medium text-gray-700">
+                  {t("include")}
+                </span>
               </label>
               {item.containedIn && (
                 <span className="rounded-full bg-[#FFF9E6] px-2 py-0.5 text-xs font-medium text-[#B8860B]">
-                  Inside: {item.containedIn}
+                  {t("insideLabel")} {item.containedIn}
                 </span>
               )}
             </div>
@@ -120,7 +122,7 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
                 htmlFor={`item-name-${originalIndex}`}
                 className="mb-1 block text-xs font-medium text-gray-500"
               >
-                Name
+                {t("name")}
               </label>
               <input
                 id={`item-name-${originalIndex}`}
@@ -137,7 +139,7 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
                 htmlFor={`item-desc-${originalIndex}`}
                 className="mb-1 block text-xs font-medium text-gray-500"
               >
-                Description
+                {t("description")}
               </label>
               <input
                 id={`item-desc-${originalIndex}`}
@@ -154,7 +156,7 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
                 htmlFor={`item-qty-${originalIndex}`}
                 className="mb-1 block text-xs font-medium text-gray-500"
               >
-                Quantity
+                {t("quantity")}
               </label>
               <input
                 id={`item-qty-${originalIndex}`}
@@ -180,7 +182,7 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
                   className="accent-[#FFC107]"
                 />
                 <Package className="h-4 w-4" />
-                Container
+                {t("container")}
               </label>
             </div>
             <div className="sm:col-span-2">
@@ -188,7 +190,7 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
                 htmlFor={`item-parent-${originalIndex}`}
                 className="mb-1 block text-xs font-medium text-gray-500"
               >
-                Inside container
+                {t("insideContainer")}
               </label>
               <select
                 id={`item-parent-${originalIndex}`}
@@ -200,7 +202,7 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
                 }
                 className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm text-black focus:border-[#FFC107] focus:outline-none"
               >
-                <option value="">None (top-level)</option>
+                <option value="">{t("noneTop")}</option>
                 {containerNames
                   .filter((name) => name !== item.name)
                   .map((name) => (

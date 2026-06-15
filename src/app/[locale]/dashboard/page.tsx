@@ -2,12 +2,17 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { signOut } from "next-auth/react";
+import { useTranslations } from "next-intl";
 
+import { LangSwitcher } from "@/components/lang-switcher";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
 const DashboardPage = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const tNav = useTranslations("nav");
+  const tHome = useTranslations("home");
+  const tDashboard = useTranslations("dashboard");
 
   const { data: warehouses } = useQuery({
     queryKey: ["warehouses"],
@@ -69,7 +74,9 @@ const DashboardPage = () => {
               <line x1="12" y1="22.08" x2="12" y2="12" />
             </svg>
           </div>
-          <span className="font-semibold text-black">AI Warehouse</span>
+          <span className="font-semibold text-black">
+            {tNav("aiAssistant")}
+          </span>
         </div>
 
         {/* Navigation */}
@@ -87,12 +94,13 @@ const DashboardPage = () => {
                 }`}
               >
                 <span className="text-lg">{item.icon}</span>
-                {item.label}
+                {tNav(item.href.replace("/", ""))}
               </Link>
             );
           })}
         </nav>
 
+        <LangSwitcher />
         {/* Logout */}
         <button
           onClick={handleLogout}
@@ -111,7 +119,7 @@ const DashboardPage = () => {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-          Logout
+          {tNav("logout")}
         </button>
       </aside>
 
@@ -119,9 +127,12 @@ const DashboardPage = () => {
       <main className="flex-1 bg-[#f5f5f5] p-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-black">Dashboard</h1>
+          <h1 className="mb-2 text-3xl font-bold text-black">
+            {tHome("welcomeTitle") || "Dashboard"}
+          </h1>
           <p className="text-gray-600">
-            Welcome back! Here&apos;s what&apos;s happening today.
+            {tHome("welcomeSubtitle") ||
+              "Welcome back! Here's what's happening today."}
           </p>
         </div>
 
@@ -175,7 +186,9 @@ const DashboardPage = () => {
               <div className="text-2xl font-bold text-black">
                 {totalItems !== null ? totalItems.toLocaleString() : "—"}
               </div>
-              <div className="text-sm text-gray-600">Total Items</div>
+              <div className="text-sm text-gray-600">
+                {tDashboard("totalItemsLabel")}
+              </div>
             </div>
 
             {/* Scanned Today */}
@@ -198,7 +211,9 @@ const DashboardPage = () => {
               <div className="text-2xl font-bold text-black">
                 {scansToday ? scansToday.count : "—"}
               </div>
-              <div className="text-sm text-gray-600">Scanned Today</div>
+              <div className="text-sm text-gray-600">
+                {tDashboard("scannedTodayLabel")}
+              </div>
             </div>
 
             {/* Active Zones */}
@@ -221,7 +236,9 @@ const DashboardPage = () => {
               <div className="text-2xl font-bold text-black">
                 {activeZones !== null ? activeZones : "—"}
               </div>
-              <div className="text-sm text-gray-600">Active Zones</div>
+              <div className="text-sm text-gray-600">
+                {tDashboard("activeZonesLabel")}
+              </div>
             </div>
           </div>
         )}
@@ -250,8 +267,10 @@ const DashboardPage = () => {
                 <circle cx="17" cy="9" r="1" fill="currentColor" />
               </svg>
             </div>
-            <h3 className="mb-2 text-xl font-bold text-black">Scan Items</h3>
-            <p className="text-black/80">Start scanning warehouse items</p>
+            <h3 className="mb-2 text-xl font-bold text-black">
+              {tDashboard("scanItemsTitle")}
+            </h3>
+            <p className="text-black/80">{tDashboard("scanItemsDesc")}</p>
           </Link>
 
           {/* AI Assistant Card */}
@@ -269,8 +288,10 @@ const DashboardPage = () => {
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
             </div>
-            <h3 className="mb-2 text-xl font-bold text-black">AI Assistant</h3>
-            <p className="text-gray-600">Chat with warehouse AI</p>
+            <h3 className="mb-2 text-xl font-bold text-black">
+              {tDashboard("aiAssistantTitle")}
+            </h3>
+            <p className="text-gray-600">{tDashboard("aiAssistantDesc")}</p>
           </div>
         </div>
       </main>

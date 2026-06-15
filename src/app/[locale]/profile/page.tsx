@@ -2,14 +2,18 @@
 
 /* eslint-disable @next/next/no-img-element */
 import { signOut, useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
+import { LangSwitcher } from "@/components/lang-switcher";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
 const ProfilePage = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session, status, update: updateSession } = useSession();
+  const tNav = useTranslations("nav");
+  const tProfile = useTranslations("profile");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -84,18 +88,18 @@ const ProfilePage = () => {
       });
 
       if (response.ok) {
-        setMessage({ type: "success", text: "Profile updated successfully!" });
+        setMessage({ type: "success", text: tProfile("profileUpdated") });
         setIsEditing(false);
         await updateSession();
       } else {
         const data = await response.json();
         setMessage({
           type: "error",
-          text: data.error || "Failed to update profile",
+          text: data.error || tProfile("failedUpdate"),
         });
       }
     } catch {
-      setMessage({ type: "error", text: "Failed to update profile" });
+      setMessage({ type: "error", text: tProfile("failedUpdate") });
     } finally {
       setIsSaving(false);
     }
@@ -105,15 +109,12 @@ const ProfilePage = () => {
     setMessage(null);
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setMessage({ type: "error", text: "New passwords do not match" });
+      setMessage({ type: "error", text: tProfile("passwordsMismatch") });
       return;
     }
 
     if (passwordData.newPassword.length < 6) {
-      setMessage({
-        type: "error",
-        text: "Password must be at least 6 characters",
-      });
+      setMessage({ type: "error", text: tProfile("passwordTooShort") });
       return;
     }
 
@@ -130,7 +131,7 @@ const ProfilePage = () => {
       });
 
       if (response.ok) {
-        setMessage({ type: "success", text: "Password changed successfully!" });
+        setMessage({ type: "success", text: tProfile("passwordChanged") });
         setIsChangingPassword(false);
         setPasswordData({
           currentPassword: "",
@@ -141,11 +142,11 @@ const ProfilePage = () => {
         const data = await response.json();
         setMessage({
           type: "error",
-          text: data.error || "Failed to change password",
+          text: data.error || tProfile("failedChangePassword"),
         });
       }
     } catch {
-      setMessage({ type: "error", text: "Failed to change password" });
+      setMessage({ type: "error", text: tProfile("failedChangePassword") });
     } finally {
       setIsSaving(false);
     }
@@ -161,7 +162,7 @@ const ProfilePage = () => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 1024 * 1024) {
-        setMessage({ type: "error", text: "Image must be less than 1MB" });
+        setMessage({ type: "error", text: tProfile("imageTooLarge") });
         return;
       }
 
@@ -184,7 +185,7 @@ const ProfilePage = () => {
   if (isLoading || !session?.user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#1a1d2e]">
-        <div className="text-white">Loading...</div>
+        <div className="text-white">{tProfile("loading")}</div>
       </div>
     );
   }
@@ -210,7 +211,9 @@ const ProfilePage = () => {
               <line x1="12" y1="22.08" x2="12" y2="12" />
             </svg>
           </div>
-          <span className="font-semibold text-black">AI Warehouse</span>
+          <span className="font-semibold text-black">
+            {tNav("ai-assistant")}
+          </span>
         </div>
 
         {/* Navigation */}
@@ -228,12 +231,13 @@ const ProfilePage = () => {
                 }`}
               >
                 <span className="text-lg">{item.icon}</span>
-                {item.label}
+                {tNav(item.href.replace("/", ""))}
               </Link>
             );
           })}
         </nav>
 
+        <LangSwitcher />
         {/* Logout */}
         <button
           onClick={handleLogout}
@@ -252,7 +256,7 @@ const ProfilePage = () => {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-          Logout
+          {tNav("logout")}
         </button>
       </aside>
 
@@ -260,8 +264,10 @@ const ProfilePage = () => {
       <main className="flex-1 bg-[#f5f5f5] p-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-black">Profile</h1>
-          <p className="text-gray-600">Manage your personal information</p>
+          <h1 className="mb-2 text-3xl font-bold text-black">
+            {tProfile("title")}
+          </h1>
+          <p className="text-gray-600">{tProfile("subtitle")}</p>
         </div>
 
         {/* Message */}
@@ -283,14 +289,14 @@ const ProfilePage = () => {
             <div className="rounded-xl bg-white p-8 shadow-sm">
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-black">
-                  Personal Information
+                  {tProfile("personalInfo")}
                 </h2>
                 {!isEditing ? (
                   <button
                     onClick={() => setIsEditing(true)}
                     className="rounded-lg bg-[#FFC107] px-4 py-2 font-medium text-black transition hover:bg-[#FFB800]"
                   >
-                    Edit Profile
+                    {tProfile("editProfile")}
                   </button>
                 ) : (
                   <div className="flex gap-2">
@@ -301,14 +307,14 @@ const ProfilePage = () => {
                       }}
                       className="rounded-lg border border-gray-200 px-4 py-2 font-medium text-gray-600 transition hover:bg-gray-50"
                     >
-                      Cancel
+                      {tProfile("cancel")}
                     </button>
                     <button
                       onClick={handleSave}
                       disabled={isSaving}
                       className="rounded-lg bg-[#FFC107] px-4 py-2 font-medium text-black transition hover:bg-[#FFB800] disabled:opacity-50"
                     >
-                      {isSaving ? "Saving..." : "Save Changes"}
+                      {isSaving ? tProfile("saving") : tProfile("saveChanges")}
                     </button>
                   </div>
                 )}
@@ -321,7 +327,7 @@ const ProfilePage = () => {
                     htmlFor="name"
                     className="mb-2 block text-sm font-medium text-gray-700"
                   >
-                    Full Name
+                    {tProfile("fullName")}
                   </label>
                   <input
                     id="name"
@@ -345,7 +351,7 @@ const ProfilePage = () => {
                     htmlFor="email"
                     className="mb-2 block text-sm font-medium text-gray-700"
                   >
-                    Email Address
+                    {tProfile("emailAddress")}
                   </label>
                   <input
                     id="email"
@@ -369,7 +375,7 @@ const ProfilePage = () => {
                     htmlFor="location"
                     className="mb-2 block text-sm font-medium text-gray-700"
                   >
-                    Location
+                    {tProfile("locationLabel")}
                   </label>
                   <input
                     id="location"
@@ -393,14 +399,14 @@ const ProfilePage = () => {
             <div className="mt-6 rounded-xl bg-white p-8 shadow-sm">
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-black">
-                  Change Password
+                  {tProfile("changePasswordTitle")}
                 </h2>
                 {!isChangingPassword && (
                   <button
                     onClick={() => setIsChangingPassword(true)}
                     className="rounded-lg bg-[#FFC107] px-4 py-2 font-medium text-black transition hover:bg-[#FFB800]"
                   >
-                    Change Password
+                    {tProfile("changePasswordButton")}
                   </button>
                 )}
               </div>
@@ -412,7 +418,7 @@ const ProfilePage = () => {
                       htmlFor="currentPassword"
                       className="mb-2 block text-sm font-medium text-gray-700"
                     >
-                      Current Password
+                      {tProfile("currentPassword")}
                     </label>
                     <input
                       id="currentPassword"
@@ -433,7 +439,7 @@ const ProfilePage = () => {
                       htmlFor="newPassword"
                       className="mb-2 block text-sm font-medium text-gray-700"
                     >
-                      New Password
+                      {tProfile("newPassword")}
                     </label>
                     <input
                       id="newPassword"
@@ -454,7 +460,7 @@ const ProfilePage = () => {
                       htmlFor="confirmPassword"
                       className="mb-2 block text-sm font-medium text-gray-700"
                     >
-                      Confirm New Password
+                      {tProfile("confirmNewPassword")}
                     </label>
                     <input
                       id="confirmPassword"
@@ -482,14 +488,16 @@ const ProfilePage = () => {
                       }}
                       className="rounded-lg border border-gray-200 px-4 py-2 font-medium text-gray-600 transition hover:bg-gray-50"
                     >
-                      Cancel
+                      {tProfile("cancel")}
                     </button>
                     <button
                       onClick={handlePasswordChange}
                       disabled={isSaving}
                       className="rounded-lg bg-[#FFC107] px-4 py-2 font-medium text-black transition hover:bg-[#FFB800] disabled:opacity-50"
                     >
-                      {isSaving ? "Updating..." : "Update Password"}
+                      {isSaving
+                        ? tProfile("updating")
+                        : tProfile("updatePassword")}
                     </button>
                   </div>
                 </div>
@@ -521,7 +529,7 @@ const ProfilePage = () => {
                   {formData.image ? (
                     <img
                       src={formData.image}
-                      alt="Avatar"
+                      alt={tProfile("avatarAlt")}
                       className="h-full w-full object-cover"
                     />
                   ) : (
@@ -536,7 +544,7 @@ const ProfilePage = () => {
                 </button>
                 {isEditing && (
                   <p className="mb-2 text-xs text-gray-500">
-                    Click to upload (max 1MB)
+                    {tProfile("imageUploadHint")}
                   </p>
                 )}
                 <h3 className="text-lg font-semibold text-black">
@@ -549,15 +557,15 @@ const ProfilePage = () => {
 
             {/* Account Info Card */}
             <div className="rounded-xl bg-white p-6 shadow-sm">
-              <h3 className="mb-4 font-bold text-black">Account Info</h3>
+              <h3 className="mb-4 font-bold text-black">
+                {tProfile("accountInfo")}
+              </h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Status</span>
-                  <span className="font-medium text-green-600">Active</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Member since</span>
-                  <span className="font-medium text-black">Jan 2024</span>
+                  <span className="text-gray-600">{tProfile("status")}</span>
+                  <span className="font-medium text-green-600">
+                    {tProfile("active")}
+                  </span>
                 </div>
               </div>
             </div>

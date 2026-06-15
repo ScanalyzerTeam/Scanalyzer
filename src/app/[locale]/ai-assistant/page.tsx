@@ -1,8 +1,10 @@
 "use client";
 
 import { signOut } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
+import { LangSwitcher } from "@/components/lang-switcher";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
 interface Message {
@@ -15,6 +17,8 @@ interface Message {
 const AIAssistantPage = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const tNav = useTranslations("nav");
+  const tAi = useTranslations("aiAssistant");
   const [mounted, setMounted] = useState(false);
   const [messages, setMessages] = useState([] as Message[]);
   const [input, setInput] = useState("");
@@ -111,7 +115,7 @@ const AIAssistantPage = () => {
               <line x1="12" y1="22.08" x2="12" y2="12" />
             </svg>
           </div>
-          <span className="font-semibold text-black">AI Warehouse</span>
+          <span className="font-semibold text-black">{tAi("logo")}</span>
         </div>
 
         {/* Navigation */}
@@ -129,12 +133,13 @@ const AIAssistantPage = () => {
                 }`}
               >
                 <span className="text-lg">{item.icon}</span>
-                {item.label}
+                {tNav(item.href.replace("/", ""))}
               </Link>
             );
           })}
         </nav>
 
+        <LangSwitcher />
         {/* Logout */}
         <button
           onClick={handleLogout}
@@ -153,7 +158,7 @@ const AIAssistantPage = () => {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-          Logout
+          {tNav("logout")}
         </button>
       </aside>
 
@@ -161,8 +166,8 @@ const AIAssistantPage = () => {
       <main className="flex flex-1 flex-col bg-white p-8">
         {/* Header */}
         <div className="mb-6 border-b pb-6">
-          <h1 className="text-3xl font-bold text-black">AI Assistant</h1>
-          <p className="text-gray-600">Ask me anything about the warehouse</p>
+          <h1 className="text-3xl font-bold text-black">{tAi("title")}</h1>
+          <p className="text-gray-600">{tAi("subtitle")}</p>
         </div>
 
         {/* Chat Container */}
@@ -245,7 +250,7 @@ const AIAssistantPage = () => {
                 </svg>
               </div>
               <div className="flex items-center gap-2 rounded-lg rounded-bl-none bg-gray-100 px-4 py-3">
-                <span className="text-sm text-gray-600">Typing</span>
+                <span className="text-sm text-gray-600">{tAi("typing")}</span>
                 <div className="flex gap-1">
                   <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400" />
                   <span className="animation-delay-100 h-2 w-2 animate-bounce rounded-full bg-gray-400" />
@@ -264,7 +269,7 @@ const AIAssistantPage = () => {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
+            placeholder={tAi("placeholder")}
             className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder-gray-500 focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
           />
           <button
@@ -284,7 +289,7 @@ const AIAssistantPage = () => {
               <line x1="22" y1="2" x2="11" y2="13" />
               <polygon points="22 2 15 22 11 13 2 9 22 2" />
             </svg>
-            Send
+            {tAi("send")}
           </button>
         </form>
       </main>

@@ -1,6 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Link, useRouter } from "@/i18n/navigation";
@@ -11,6 +12,7 @@ const SignInPage = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const tAuth = useTranslations("auth");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +27,7 @@ const SignInPage = () => {
       });
 
       if (result?.error) {
-        setError("Invalid email or password");
+        setError(tAuth("invalidCredentials"));
         setLoading(false);
         return;
       }
@@ -33,7 +35,7 @@ const SignInPage = () => {
       // Redirect to dashboard on success
       router.push("/dashboard");
     } catch {
-      setError("An error occurred. Please try again.");
+      setError(tAuth("errorOccurred"));
       setLoading(false);
     }
   };
@@ -73,9 +75,11 @@ const SignInPage = () => {
           <div className="flex flex-col justify-center bg-[#f5f5f5] p-12 md:p-16">
             <div className="mx-auto w-full max-w-sm">
               <div className="mb-8">
-                <h2 className="mb-2 text-3xl font-bold text-black">Sign In</h2>
+                <h2 className="mb-2 text-3xl font-bold text-black">
+                  {tAuth("signIn")}
+                </h2>
                 <p className="text-sm text-gray-600">
-                  Welcome back! Please enter your details.
+                  {tAuth("signInSubtitle")}
                 </p>
               </div>
 
@@ -92,14 +96,14 @@ const SignInPage = () => {
                     htmlFor="email"
                     className="mb-2 block text-sm font-medium text-black"
                   >
-                    Email
+                    {tAuth("emailLabel")}
                   </label>
                   <input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
+                    placeholder={tAuth("emailPlaceholder")}
                     className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-black placeholder-gray-400 transition focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
                     required
                   />
@@ -111,14 +115,14 @@ const SignInPage = () => {
                     htmlFor="password"
                     className="mb-2 block text-sm font-medium text-black"
                   >
-                    Password
+                    {tAuth("passwordLabel")}
                   </label>
                   <input
                     id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder={tAuth("passwordPlaceholder")}
                     className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-black placeholder-gray-400 transition focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
                     required
                   />
@@ -129,17 +133,17 @@ const SignInPage = () => {
                   disabled={loading}
                   className="w-full rounded-lg bg-[#FFC107] px-4 py-3 font-semibold text-black transition hover:bg-[#FFB300] focus:ring-2 focus:ring-[#FFC107] focus:ring-offset-2 focus:outline-none disabled:opacity-50"
                 >
-                  {loading ? "Signing in..." : "Sign In"}
+                  {loading ? tAuth("signingIn") : tAuth("signIn")}
                 </button>
               </form>
 
               <p className="mt-6 text-center text-sm text-gray-600">
-                Don&apos;t have an account?{" "}
+                {tAuth("noAccount")}{" "}
                 <Link
                   href="/signup"
                   className="font-medium text-[#FFC107] transition hover:text-[#FFB300]"
                 >
-                  Sign up
+                  {tAuth("signUp")}
                 </Link>
               </p>
             </div>
