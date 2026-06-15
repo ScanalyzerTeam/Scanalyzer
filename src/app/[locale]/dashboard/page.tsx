@@ -26,7 +26,9 @@ const DashboardPage = () => {
   const { data: scansToday } = useQuery({
     queryKey: ["scansToday"],
     queryFn: async () => {
-      const res = await fetch("/api/scans/today");
+      const res = await fetch("/api/scans/today", {
+        credentials: "same-origin",
+      });
       if (!res.ok) throw new Error("Failed to fetch scan count");
       return res.json() as Promise<{ count: number }>;
     },
@@ -274,7 +276,10 @@ const DashboardPage = () => {
           </Link>
 
           {/* AI Assistant Card */}
-          <div className="group cursor-pointer rounded-xl bg-white p-8 shadow-sm transition hover:shadow-lg">
+          <Link
+            href="/ai-assistant"
+            className="group cursor-pointer rounded-xl bg-white p-8 shadow-sm transition hover:shadow-lg"
+          >
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-gray-100">
               <svg
                 className="h-8 w-8 text-black"
@@ -292,7 +297,7 @@ const DashboardPage = () => {
               {tDashboard("aiAssistantTitle")}
             </h3>
             <p className="text-gray-600">{tDashboard("aiAssistantDesc")}</p>
-          </div>
+          </Link>
         </div>
       </main>
     </div>

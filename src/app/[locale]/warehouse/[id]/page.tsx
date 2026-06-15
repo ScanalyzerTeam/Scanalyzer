@@ -24,7 +24,6 @@ const WarehouseMapPage = () => {
   const queryClient = useQueryClient();
   const warehouseId = params.id as string;
 
-  // UI state
   const [selectedShelfId, setSelectedShelfId] = useState<string | null>(null);
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -43,7 +42,6 @@ const WarehouseMapPage = () => {
     { icon: "👤", label: "Profile", href: "/profile" },
   ];
 
-  // Fetch warehouse with shelves
   const { data: warehouse, isLoading } = useQuery<WarehouseWithShelves>({
     queryKey: ["warehouse", warehouseId],
     queryFn: async () => {
@@ -55,7 +53,6 @@ const WarehouseMapPage = () => {
     refetchInterval: 3000,
   });
 
-  // Create shelf mutation
   const createShelf = useMutation({
     mutationFn: async (warehouseId: string) => {
       const existingShelves = warehouse?.shelves || [];
@@ -85,7 +82,6 @@ const WarehouseMapPage = () => {
     },
   });
 
-  // Update shelf mutation
   const updateShelf = useMutation({
     mutationFn: async ({
       shelfId,
@@ -107,12 +103,9 @@ const WarehouseMapPage = () => {
     },
   });
 
-  // Delete shelf mutation
   const deleteShelf = useMutation({
     mutationFn: async (shelfId: string) => {
-      const res = await fetch(`/api/shelves/${shelfId}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(`/api/shelves/${shelfId}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete shelf");
       return res.json();
     },
@@ -142,30 +135,37 @@ const WarehouseMapPage = () => {
   const handleRotateLeft = () => {
     if (!selectedShelfId || !warehouse) return;
     const shelf = warehouse.shelves.find((s) => s.id === selectedShelfId);
-    if (shelf) {
-      const newRotation = ((shelf.rotation || 0) - 90 + 360) % 360;
-      handleUpdateShelf(selectedShelfId, { rotation: newRotation });
-    }
+    if (shelf)
+      handleUpdateShelf(selectedShelfId, {
+        rotation: ((shelf.rotation || 0) - 90 + 360) % 360,
+      });
   };
 
   const handleRotateRight = () => {
     if (!selectedShelfId || !warehouse) return;
     const shelf = warehouse.shelves.find((s) => s.id === selectedShelfId);
-    if (shelf) {
-      const newRotation = ((shelf.rotation || 0) + 90) % 360;
-      handleUpdateShelf(selectedShelfId, { rotation: newRotation });
-    }
+    if (shelf)
+      handleUpdateShelf(selectedShelfId, {
+        rotation: ((shelf.rotation || 0) + 90) % 360,
+      });
   };
 
   const selectedShelf = warehouse?.shelves.find(
     (s) => s.id === selectedShelfId,
   );
+  const totalItems =
+    warehouse?.shelves.reduce(
+      (sum, s) =>
+        sum +
+        ((s as { _count?: { inventoryItems?: number } })._count
+          ?.inventoryItems ?? 0),
+      0,
+    ) ?? 0;
 
   return (
     <div className="flex h-screen bg-[#1a1d2e]">
       {/* Sidebar */}
-      <aside className="flex w-64 shrink-0 flex-col bg-white p-6">
-        {/* Logo */}
+      <aside className="flex w-64 shrink-0 flex-col bg-white p-6 shadow-sm">
         <div className="mb-8 flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#FFC107]">
             <svg
@@ -187,21 +187,20 @@ const WarehouseMapPage = () => {
           </span>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 space-y-2">
+        <nav className="flex-1 space-y-1">
           {menuItems.map((item) => {
             const isActive = pathname?.includes(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition ${
+                className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all ${
                   isActive
                     ? "bg-[#FFF9E6] text-black"
-                    : "text-gray-600 hover:bg-gray-100"
+                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
+                <span className="text-base">{item.icon}</span>
                 {tNav(item.href.replace("/", ""))}
               </Link>
             );
@@ -209,10 +208,9 @@ const WarehouseMapPage = () => {
         </nav>
 
         <LangSwitcher />
-        {/* Logout */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-gray-600 transition hover:bg-gray-100"
+          className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-500 transition-all hover:bg-gray-50 hover:text-gray-800"
         >
           <svg
             className="h-5 w-5"
@@ -232,61 +230,94 @@ const WarehouseMapPage = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f5f5f5]">
+      <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f7f8fa]">
         {/* Header */}
-        <div className="border-b border-gray-200 bg-white p-6">
+        <div className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
           <div className="flex items-center gap-4">
             <Link
               href="/warehouse"
-              className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-gray-600 transition hover:bg-gray-200"
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 text-gray-500 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-4 w-4" />
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-black">
+              <h1 className="text-xl font-bold text-black">
                 {warehouse?.name || tWarehouse("loadingZones")}
               </h1>
-              <p className="text-gray-600">{tWarehouse("subtitle")}</p>
+              <p className="text-sm text-gray-500">{tWarehouse("subtitle")}</p>
             </div>
           </div>
+
+          {/* Inline stats */}
+          {warehouse && (
+            <div className="flex items-center gap-6">
+              <div className="text-right">
+                <p className="text-xs font-medium tracking-wide text-gray-400 uppercase">
+                  {tWarehouse("shelves") ?? "Shelves"}
+                </p>
+                <p className="text-lg font-bold text-black">
+                  {warehouse.shelves.length}
+                </p>
+              </div>
+              <div className="h-8 w-px bg-gray-200" />
+              <div className="text-right">
+                <p className="text-xs font-medium tracking-wide text-gray-400 uppercase">
+                  {tWarehouse("items") ?? "Items"}
+                </p>
+                <p className="text-lg font-bold text-black">{totalItems}</p>
+              </div>
+              <div className="h-8 w-px bg-gray-200" />
+              <div className="text-right">
+                <p className="text-xs font-medium tracking-wide text-gray-400 uppercase">
+                  {tWarehouse("dimensions") ?? "Size"}
+                </p>
+                <p className="text-lg font-bold text-black">
+                  {warehouse.width}×{warehouse.height}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Error Alert */}
         {error && (
-          <div className="border-b border-red-200 bg-red-50 p-4">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-red-800">{error}</p>
-              <button
-                onClick={() => setError(null)}
-                className="text-red-600 hover:text-red-800"
-              >
-                <X className="h-4 w-4" />
-              </button>
+          <div className="flex items-center justify-between border-b border-red-100 bg-red-50 px-6 py-3">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-red-500" />
+              <p className="text-sm font-medium text-red-700">{error}</p>
             </div>
+            <button
+              onClick={() => setError(null)}
+              className="rounded-lg p-1 text-red-400 hover:bg-red-100 hover:text-red-600"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
         )}
 
         {/* Content Area */}
         <div className="flex flex-1 overflow-hidden">
-          {/* Canvas Area */}
-          <div className="flex min-w-0 flex-1 flex-col p-6">
+          <div className="flex min-w-0 flex-1 flex-col gap-4 p-6">
             {isLoading ? (
-              <div className="flex flex-1 items-center justify-center">
-                <div className="animate-pulse text-gray-500">
+              <div className="flex flex-1 flex-col items-center justify-center gap-3">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-[#FFC107]" />
+                <p className="text-sm text-gray-400">
                   {tWarehouse("loadingZones")}
-                </div>
+                </p>
               </div>
             ) : !warehouse ? (
-              <div className="flex flex-1 flex-col items-center justify-center rounded-xl bg-white p-12">
-                <WarehouseIcon className="mb-4 h-16 w-16 text-gray-300" />
-                <h3 className="mb-2 text-xl font-semibold text-gray-700">
+              <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white p-12">
+                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-gray-50">
+                  <WarehouseIcon className="h-10 w-10 text-gray-300" />
+                </div>
+                <h3 className="mb-1 text-lg font-semibold text-gray-700">
                   {tWarehouse("warehouseNotFound")}
                 </h3>
-                <p className="mb-6 text-gray-500">
+                <p className="mb-6 text-sm text-gray-400">
                   {tWarehouse("warehouseNotFoundDesc")}
                 </p>
                 <Link href="/warehouse">
-                  <Button>
+                  <Button size="sm">
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     {tWarehouse("backToZones")}
                   </Button>
@@ -294,23 +325,27 @@ const WarehouseMapPage = () => {
               </div>
             ) : (
               <>
-                {/* Toolbar */}
-                <div className="mb-4">
-                  <WarehouseToolbar
-                    scale={scale}
-                    onZoomIn={handleZoomIn}
-                    onZoomOut={handleZoomOut}
-                    onReset={handleResetView}
-                    onAddShelf={() => createShelf.mutate(warehouse.id)}
-                    selectedShelfId={selectedShelfId}
-                    onDeleteShelf={handleDeleteShelf}
-                    onRotateLeft={handleRotateLeft}
-                    onRotateRight={handleRotateRight}
-                  />
-                </div>
+                <WarehouseToolbar
+                  scale={scale}
+                  onZoomIn={handleZoomIn}
+                  onZoomOut={handleZoomOut}
+                  onReset={handleResetView}
+                  onAddShelf={() => createShelf.mutate(warehouse.id)}
+                  selectedShelfId={selectedShelfId}
+                  onDeleteShelf={handleDeleteShelf}
+                  onRotateLeft={handleRotateLeft}
+                  onRotateRight={handleRotateRight}
+                />
 
-                {/* Canvas */}
-                <div className="flex-1 rounded-xl bg-white p-4 shadow-sm">
+                {/* Canvas with dot-grid background */}
+                <div
+                  className="relative flex-1 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(circle, #d1d5db 1px, transparent 1px)",
+                    backgroundSize: "24px 24px",
+                  }}
+                >
                   <WarehouseCanvas
                     warehouse={warehouse}
                     shelves={warehouse.shelves}
@@ -322,6 +357,11 @@ const WarehouseMapPage = () => {
                     onScaleChange={setScale}
                     onPositionChange={setPosition}
                   />
+
+                  {/* Scale badge */}
+                  <div className="absolute right-4 bottom-4 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-500 shadow-sm">
+                    {Math.round(scale * 100)}%
+                  </div>
                 </div>
               </>
             )}
@@ -329,11 +369,13 @@ const WarehouseMapPage = () => {
 
           {/* Inventory Panel */}
           {selectedShelf && (
-            <ShelfInventoryPanel
-              shelf={selectedShelf}
-              warehouseId={warehouseId}
-              onClose={() => setSelectedShelfId(null)}
-            />
+            <div className="animate-in slide-in-from-right-4 duration-200">
+              <ShelfInventoryPanel
+                shelf={selectedShelf}
+                warehouseId={warehouseId}
+                onClose={() => setSelectedShelfId(null)}
+              />
+            </div>
           )}
         </div>
       </main>

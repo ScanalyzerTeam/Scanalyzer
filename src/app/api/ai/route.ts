@@ -241,8 +241,13 @@ Rules:
         .select({ quantity: items.quantity })
         .from(items)
         .innerJoin(shelves, eq(items.shelfId, shelves.id))
-        .where(eq(shelves.warehouseId, warehouseRecord.id));
-      const total = allItems.reduce((s, it) => s + (it.quantity || 1), 0);
+        .where(
+          and(
+            eq(shelves.warehouseId, warehouseRecord.id),
+            eq(items.isContainer, false),
+          ),
+        );
+      const total = allItems.reduce((s, it) => s + (it.quantity ?? 0), 0);
       if (
         Math.round((total / CAPACITY_LIMITS.WAREHOUSE_DEFAULT) * 100) >= 100
       ) {
@@ -314,8 +319,13 @@ Rules:
         .select({ quantity: items.quantity })
         .from(items)
         .innerJoin(shelves, eq(items.shelfId, shelves.id))
-        .where(eq(shelves.warehouseId, warehouseRecord.id));
-      const total = allItems.reduce((s, it) => s + (it.quantity || 1), 0);
+        .where(
+          and(
+            eq(shelves.warehouseId, warehouseRecord.id),
+            eq(items.isContainer, false),
+          ),
+        );
+      const total = allItems.reduce((s, it) => s + (it.quantity ?? 0), 0);
       if (
         Math.round((total / CAPACITY_LIMITS.WAREHOUSE_DEFAULT) * 100) >= 100
       ) {

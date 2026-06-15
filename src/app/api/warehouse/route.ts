@@ -1,4 +1,4 @@
-import { count, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
@@ -32,11 +32,16 @@ export async function GET() {
           .select({ quantity: items.quantity })
           .from(items)
           .innerJoin(shelves, eq(items.shelfId, shelves.id))
-          .where(eq(shelves.warehouseId, warehouse.id));
+          .where(
+            and(
+              eq(shelves.warehouseId, warehouse.id),
+              eq(items.isContainer, false),
+            ),
+          );
 
         const shelfCount = shelfCountResult?.count || 0;
         const totalItems = itemsData.reduce(
-          (sum, item) => sum + (item.quantity || 1),
+          (sum, item) => sum + (item.quantity ?? 0),
           0,
         );
         const maxCapacity = CAPACITY_LIMITS.WAREHOUSE_DEFAULT;
