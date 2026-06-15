@@ -11,8 +11,10 @@ import {
   Warehouse as WarehouseIcon,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { LangSwitcher } from "@/components/lang-switcher";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -37,6 +39,8 @@ const WarehousePage = () => {
   const pathname = usePathname();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const tNav = useTranslations("nav");
+  const tWarehouse = useTranslations("warehouse");
 
   // UI state
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
@@ -103,12 +107,7 @@ const WarehousePage = () => {
   });
 
   const handleDeleteZone = () => {
-    if (
-      selectedZoneId &&
-      confirm(
-        "Are you sure you want to delete this zone? All shelves and items will be permanently deleted.",
-      )
-    ) {
+    if (selectedZoneId && confirm(tWarehouse("confirmDelete"))) {
       deleteWarehouse.mutate(selectedZoneId);
     }
   };
@@ -154,7 +153,9 @@ const WarehousePage = () => {
               <line x1="12" y1="22.08" x2="12" y2="12" />
             </svg>
           </div>
-          <span className="font-semibold text-black">AI Warehouse</span>
+          <span className="font-semibold text-black">
+            {tNav("ai-assistant")}
+          </span>
         </div>
 
         {/* Navigation */}
@@ -172,12 +173,13 @@ const WarehousePage = () => {
                 }`}
               >
                 <span className="text-lg">{item.icon}</span>
-                {item.label}
+                {tNav(item.href.replace("/", ""))}
               </Link>
             );
           })}
         </nav>
 
+        <LangSwitcher />
         {/* Logout */}
         <button
           onClick={handleLogout}
@@ -196,7 +198,7 @@ const WarehousePage = () => {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-          Logout
+          {tNav("logout")}
         </button>
       </aside>
 
@@ -206,26 +208,32 @@ const WarehousePage = () => {
         <div className="border-b border-gray-200 bg-white p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-black">Warehouse Zones</h1>
-              <p className="text-gray-600">
-                Manage your warehouse zones and inventory
-              </p>
+              <h1 className="text-2xl font-bold text-black">
+                {tWarehouse("zones")}
+              </h1>
+              <p className="text-gray-600">{tWarehouse("zonesSubtitle")}</p>
             </div>
 
             {/* Stats */}
             <div className="flex items-center gap-6">
               <div className="text-right">
-                <p className="text-sm text-gray-500">Total Zones</p>
+                <p className="text-sm text-gray-500">
+                  {tWarehouse("totalZones")}
+                </p>
                 <p className="text-xl font-bold text-black">
                   {warehouses.length}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-gray-500">Total Shelves</p>
+                <p className="text-sm text-gray-500">
+                  {tWarehouse("totalShelves")}
+                </p>
                 <p className="text-xl font-bold text-black">{totalShelves}</p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-gray-500">Total Items</p>
+                <p className="text-sm text-gray-500">
+                  {tWarehouse("totalItems")}
+                </p>
                 <p className="text-xl font-bold text-black">{totalItems}</p>
               </div>
             </div>
@@ -239,21 +247,21 @@ const WarehousePage = () => {
             {isLoading ? (
               <div className="flex h-full items-center justify-center">
                 <div className="animate-pulse text-gray-500">
-                  Loading zones...
+                  {tWarehouse("loadingZones")}
                 </div>
               </div>
             ) : warehouses.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center">
                 <WarehouseIcon className="mb-4 h-16 w-16 text-gray-300" />
                 <h3 className="mb-2 text-xl font-semibold text-gray-700">
-                  No zones yet
+                  {tWarehouse("noZones")}
                 </h3>
                 <p className="mb-6 text-gray-500">
-                  Create your first warehouse zone to get started
+                  {tWarehouse("createFirstZone")}
                 </p>
                 <Button onClick={() => setShowCreateZone(true)}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Zone
+                  {tWarehouse("addZone")}
                 </Button>
               </div>
             ) : (
@@ -302,18 +310,24 @@ const WarehousePage = () => {
                     <div className="flex items-center gap-4 text-sm">
                       <div className="flex items-center gap-1.5 text-gray-600">
                         <Box className="h-4 w-4" />
-                        <span>{warehouse.shelfCount || 0} shelves</span>
+                        <span>
+                          {warehouse.shelfCount || 0} {tWarehouse("shelves")}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1.5 text-gray-600">
                         <Package className="h-4 w-4" />
-                        <span>{warehouse.itemCount || 0} items</span>
+                        <span>
+                          {warehouse.itemCount || 0} {tWarehouse("items")}
+                        </span>
                       </div>
                     </div>
 
                     {/* Capacity indicator */}
                     <div className="mt-4">
                       <div className="mb-1 flex items-center justify-between text-xs">
-                        <span className="text-gray-500">Capacity</span>
+                        <span className="text-gray-500">
+                          {tWarehouse("capacity")}
+                        </span>
                         <span className="font-medium text-gray-700">
                           {Math.min(100, warehouse.capacityUtilization || 0)}%
                         </span>
@@ -337,7 +351,7 @@ const WarehousePage = () => {
                     className="flex min-h-[200px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-white p-6 text-gray-400 transition hover:border-[#FFC107] hover:text-[#FFC107]"
                   >
                     <Plus className="mb-2 h-8 w-8" />
-                    <span className="font-medium">Add Zone</span>
+                    <span className="font-medium">{tWarehouse("addZone")}</span>
                   </button>
                 )}
               </div>
@@ -349,7 +363,7 @@ const WarehousePage = () => {
             <div className="flex w-80 flex-col border-l border-gray-200 bg-white p-6">
               <div className="mb-6 flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-black">
-                  Zone Details
+                  {tWarehouse("zoneDetails")}
                 </h3>
                 <button
                   onClick={() => setSelectedZoneId(null)}
@@ -382,7 +396,7 @@ const WarehousePage = () => {
                   {selectedWarehouse.name}
                 </h4>
                 <p className="text-sm text-gray-500">
-                  Zone{" "}
+                  {tWarehouse("zoneName")}{" "}
                   {getZoneLetter(
                     warehouses.findIndex((w) => w.id === selectedWarehouse.id),
                   )}
@@ -394,7 +408,9 @@ const WarehousePage = () => {
                 <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                   <div className="flex items-center gap-2">
                     <Box className="h-5 w-5 text-gray-400" />
-                    <span className="text-sm text-gray-600">Shelves</span>
+                    <span className="text-sm text-gray-600">
+                      {tWarehouse("shelves")}
+                    </span>
                   </div>
                   <span className="font-semibold text-black">
                     {selectedWarehouse.shelfCount || 0}
@@ -404,7 +420,9 @@ const WarehousePage = () => {
                 <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                   <div className="flex items-center gap-2">
                     <Package className="h-5 w-5 text-gray-400" />
-                    <span className="text-sm text-gray-600">Items</span>
+                    <span className="text-sm text-gray-600">
+                      {tWarehouse("items")}
+                    </span>
                   </div>
                   <span className="font-semibold text-black">
                     {selectedWarehouse.itemCount || 0}
@@ -414,7 +432,9 @@ const WarehousePage = () => {
                 <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                   <div className="flex items-center gap-2">
                     <MapPin className="h-5 w-5 text-gray-400" />
-                    <span className="text-sm text-gray-600">Dimensions</span>
+                    <span className="text-sm text-gray-600">
+                      {tWarehouse("dimensions")}
+                    </span>
                   </div>
                   <span className="font-semibold text-black">
                     {selectedWarehouse.width}x{selectedWarehouse.height}
@@ -426,7 +446,7 @@ const WarehousePage = () => {
               <Link href={`/warehouse/${selectedWarehouse.id}`}>
                 <Button className="w-full">
                   <MapPin className="mr-2 h-4 w-4" />
-                  Open Map View
+                  {tWarehouse("openMapView")}
                 </Button>
               </Link>
 
@@ -440,7 +460,7 @@ const WarehousePage = () => {
                 onClick={handleDeleteZone}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Delete Zone
+                {tWarehouse("delete")}
               </Button>
             </div>
           )}
@@ -451,12 +471,12 @@ const WarehousePage = () => {
       <Dialog open={showCreateZone} onOpenChange={setShowCreateZone}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Add New Zone</DialogTitle>
+            <DialogTitle>{tWarehouse("createZone")}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreateZone}>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="zone-name">Zone Name</Label>
+                <Label htmlFor="zone-name">{tWarehouse("zoneName")}</Label>
                 <Input
                   id="zone-name"
                   value={newZoneName}
@@ -471,10 +491,10 @@ const WarehousePage = () => {
                 variant="outline"
                 onClick={() => setShowCreateZone(false)}
               >
-                Cancel
+                {tWarehouse("cancel")}
               </Button>
               <Button type="submit" disabled={!newZoneName.trim()}>
-                Create Zone
+                {tWarehouse("createZone")}
               </Button>
             </DialogFooter>
           </form>

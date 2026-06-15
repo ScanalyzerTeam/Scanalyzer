@@ -3,63 +3,68 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 
+import { LangSwitcher } from "@/components/lang-switcher";
 import { Link } from "@/i18n/navigation";
 
 const LandingPage = () => {
   const t = useTranslations("home");
+  const tLanding = useTranslations("landing");
 
   const featureCards = [
     {
-      title: "Fast setup",
-      description:
-        "Start scanning inventory in minutes without long configuration.",
+      title: tLanding("feature_fast_scanning"),
+      description: tLanding("feature_fast_scanning"),
     },
     {
-      title: "Accurate results",
-      description: "AI helps reduce manual errors and improves stock accuracy.",
+      title: tLanding("feature_smart_inventory"),
+      description: tLanding("feature_smart_inventory_desc"),
     },
     {
-      title: "Visual intelligence",
-      description: "See your warehouse data clearly with smart visual reports.",
+      title: tLanding("feature_analytics"),
+      description: tLanding("feature_analytics_desc"),
     },
     {
-      title: "Mobile-ready",
-      description: "Use scanning and inventory tools on the go.",
+      title: tLanding("feature_photo_scanner"),
+      description: tLanding("feature_photo_scanner_desc"),
     },
   ];
 
   const workflowSteps = [
     {
-      label: "Scan",
-      value: "Capture items with photo and barcode scan",
+      label: tLanding("workflow_scan_label") || "Scan",
+      value:
+        tLanding("workflow_scan_value") ||
+        "Capture items with photo and barcode scan",
       color: "bg-[#38bdf8]",
     },
     {
-      label: "Organize",
-      value: "Group items into shelves and warehouses",
+      label: tLanding("workflow_organize_label") || "Organize",
+      value:
+        tLanding("workflow_organize_value") ||
+        "Group items into shelves and warehouses",
       color: "bg-[#fbbf24]",
     },
     {
-      label: "Analyze",
-      value: "Track stock levels and optimize operations",
+      label: tLanding("workflow_analyze_label") || "Analyze",
+      value:
+        tLanding("workflow_analyze_value") ||
+        "Track stock levels and optimize operations",
       color: "bg-[#a855f7]",
     },
   ];
 
   const features = [
     {
-      title: "Smart Inventory",
-      description:
-        "AI-powered tracking for your items, shelves, and warehouses.",
+      title: tLanding("feature_smart_inventory"),
+      description: tLanding("feature_smart_inventory_desc"),
     },
     {
-      title: "Photo Scanner",
-      description: "Capture items quickly and keep records instantly.",
+      title: tLanding("feature_photo_scanner"),
+      description: tLanding("feature_photo_scanner_desc"),
     },
     {
-      title: "Analytics",
-      description:
-        "Use dashboards and alerts for proactive warehouse management.",
+      title: tLanding("feature_analytics"),
+      description: tLanding("feature_analytics_desc"),
     },
   ];
 
@@ -90,18 +95,21 @@ const LandingPage = () => {
                   />
                 </svg>
               </div>
-              <span className="text-xl font-semibold">Scanalyzer</span>
+              <span className="text-xl font-semibold">
+                {tLanding("productName")}
+              </span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-nowrap items-center gap-3">
+              <LangSwitcher landing />
               <Link
                 href="/signin"
-                className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white transition hover:border-white/25 hover:bg-white/10"
+                className="flex-shrink-0 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm whitespace-nowrap text-white transition hover:border-white/25 hover:bg-white/10"
               >
-                Sign in
+                {t("signIn")}
               </Link>
               <Link
                 href="/signup"
-                className="rounded-full bg-[#FFC107] px-5 py-2.5 text-sm font-semibold text-black shadow-lg shadow-[#FFC107]/20 transition hover:bg-[#FFB300]"
+                className="flex-shrink-0 rounded-full bg-[#FFC107] px-5 py-2.5 text-sm font-semibold whitespace-nowrap text-black shadow-lg shadow-[#FFC107]/20 transition hover:bg-[#FFB300]"
               >
                 {t("getStartedButton")}
               </Link>
@@ -119,12 +127,12 @@ const LandingPage = () => {
             <div className="space-y-8">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-300 shadow-2xl shadow-[#000000]/20">
                 <span className="inline-flex h-2.5 w-2.5 animate-pulse rounded-full bg-[#FFC107]" />
-                Intelligent warehouse management, built for speed.
+                {tLanding("bannerText")}
               </div>
 
               <div className="space-y-6">
                 <h1 className="max-w-3xl text-5xl leading-tight font-semibold tracking-tight text-white sm:text-6xl">
-                  Reimagine warehouse control with AI-powered scanning.
+                  {tLanding("heroTitle")}
                 </h1>
                 <p className="max-w-2xl text-lg text-gray-300 sm:text-xl">
                   {t("subtitle")}
@@ -132,36 +140,42 @@ const LandingPage = () => {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                   <Link
                     href="/signup"
-                    className="inline-flex items-center justify-center rounded-full bg-[#FFC107] px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-[#FFC107]/20 transition hover:bg-[#FFB300]"
+                    className="inline-flex items-center justify-center rounded-full bg-[#FFC107] px-6 py-3 text-sm font-semibold whitespace-nowrap text-black shadow-lg shadow-[#FFC107]/20 transition hover:bg-[#FFB300]"
                   >
-                    {t("getStartedButton")}
+                    {tLanding("getStarted")}
                   </Link>
                   <Link
                     href="/signin"
-                    className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm text-white transition hover:border-white/25 hover:bg-white/10"
+                    className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm whitespace-nowrap text-white transition hover:border-white/25 hover:bg-white/10"
                   >
-                    Sign in
+                    {t("signIn")}
                   </Link>
                 </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-3">
                 <div className="rounded-3xl bg-white/5 p-5 shadow-xl shadow-[#000000]/20 transition duration-500 hover:-translate-y-1 hover:shadow-2xl">
-                  <p className="text-sm text-gray-400">Fast item scanning</p>
+                  <p className="text-sm text-gray-400">
+                    {tLanding("feature_fast_scanning")}
+                  </p>
                   <p className="mt-2 text-2xl font-semibold text-white">
-                    2x faster
+                    {tLanding("stat_fast")}
                   </p>
                 </div>
                 <div className="rounded-3xl bg-white/5 p-5 shadow-xl shadow-[#000000]/20 transition duration-500 hover:-translate-y-1 hover:shadow-2xl">
-                  <p className="text-sm text-gray-400">Smart stock alerts</p>
+                  <p className="text-sm text-gray-400">
+                    {tLanding("feature_stock_alerts")}
+                  </p>
                   <p className="mt-2 text-2xl font-semibold text-white">
-                    Real time
+                    {tLanding("stat_real_time")}
                   </p>
                 </div>
                 <div className="rounded-3xl bg-white/5 p-5 shadow-xl shadow-[#000000]/20 transition duration-500 hover:-translate-y-1 hover:shadow-2xl">
-                  <p className="text-sm text-gray-400">Warehouse analytics</p>
+                  <p className="text-sm text-gray-400">
+                    {tLanding("feature_analytics")}
+                  </p>
                   <p className="mt-2 text-2xl font-semibold text-white">
-                    Clear insights
+                    {tLanding("stat_clear_insights")}
                   </p>
                 </div>
               </div>
@@ -174,21 +188,21 @@ const LandingPage = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm tracking-[0.32em] text-[#94a3b8] uppercase">
-                        Warehouse dashboard
+                        {tLanding("warehouseDashboard")}
                       </p>
                       <h2 className="mt-3 text-2xl font-semibold text-white">
-                        Inventory overview
+                        {tLanding("inventoryOverview")}
                       </h2>
                     </div>
                     <div className="rounded-2xl bg-white/5 px-4 py-2 text-xs tracking-[0.28em] text-[#a5b4fc] uppercase">
-                      Live
+                      {tLanding("liveLabel")}
                     </div>
                   </div>
 
                   <div className="mt-8 grid gap-4">
                     <div className="rounded-3xl bg-[#0f172a]/80 p-5">
                       <div className="flex items-center justify-between text-sm text-gray-400">
-                        <span>Items scanned</span>
+                        <span>{tLanding("itemsScanned")}</span>
                         <span className="text-white">1,246</span>
                       </div>
                       <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
@@ -198,20 +212,20 @@ const LandingPage = () => {
 
                     <div className="rounded-3xl bg-[#111827]/90 p-5">
                       <div className="flex items-center justify-between text-sm text-gray-400">
-                        <span>Pending restock</span>
+                        <span>{tLanding("pendingRestock")}</span>
                         <span className="text-white">34</span>
                       </div>
                       <div className="mt-4 grid gap-3">
                         <div className="flex items-center gap-3">
                           <div className="h-3 w-3 rounded-full bg-[#22d3ee]" />
                           <span className="text-sm text-gray-300">
-                            Packaging
+                            {tLanding("category_packaging")}
                           </span>
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="h-3 w-3 rounded-full bg-[#a855f7]" />
                           <span className="text-sm text-gray-300">
-                            Electronics
+                            {tLanding("category_electronics")}
                           </span>
                         </div>
                       </div>
@@ -238,16 +252,12 @@ const LandingPage = () => {
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-2">
           <div className="space-y-6">
             <p className="text-sm tracking-[0.32em] text-[#94a3b8] uppercase">
-              Why Scanalyzer
+              {tLanding("whyTitle")}
             </p>
             <h2 className="text-4xl font-semibold text-white">
-              A smarter workflow for every warehouse.
+              {tLanding("whySubtitle")}
             </h2>
-            <p className="max-w-xl text-gray-300">
-              Built to help teams move faster, prevent stockouts, and keep every
-              shelf optimized with fewer clicks. Bring your warehouse processes
-              into one polished dashboard.
-            </p>
+            <p className="max-w-xl text-gray-300">{tLanding("whyDesc")}</p>
             <div className="grid gap-4 sm:grid-cols-2">
               {featureCards.map((feature) => (
                 <div
@@ -292,10 +302,10 @@ const LandingPage = () => {
         <div className="pointer-events-none absolute top-0 right-0 h-64 w-64 rounded-full bg-[#7c3aed]/10 blur-3xl" />
         <div className="mx-auto max-w-5xl text-center">
           <p className="text-sm tracking-[0.32em] text-[#94a3b8] uppercase">
-            Features
+            {tLanding("featuresLabel")}
           </p>
           <h2 className="mt-3 text-4xl font-semibold text-white">
-            Everything your warehouse needs in one place
+            {tLanding("featuresSubtitle")}
           </h2>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {features.map((feature, index) => (
@@ -319,17 +329,16 @@ const LandingPage = () => {
       <section className="bg-gradient-to-r from-[#FFC107] via-[#fcd34d] to-[#f59e0b] px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl rounded-[2rem] border border-white/20 bg-black/10 p-12 text-center shadow-2xl shadow-[#000000]/30">
           <h2 className="text-3xl font-semibold text-black">
-            Ready to modernize your warehouse?
+            {tLanding("readyTitle")}
           </h2>
           <p className="mt-4 text-base text-black/80">
-            Join Scanalyzer and start managing inventory with speed, clarity,
-            and AI support.
+            {tLanding("readyDesc")}
           </p>
           <Link
             href="/signup"
             className="mt-8 inline-flex items-center justify-center rounded-full bg-black px-8 py-3 text-sm font-semibold text-[#FFC107] transition hover:bg-neutral-900"
           >
-            Get Started
+            {tLanding("getStarted")}
           </Link>
         </div>
       </section>
