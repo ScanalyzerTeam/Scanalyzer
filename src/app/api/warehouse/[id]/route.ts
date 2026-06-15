@@ -1,8 +1,8 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sum } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
-import { db, shelves, warehouses } from "@/lib/schema";
+import { db, items, shelves, warehouses } from "@/lib/schema";
 
 // GET - Get a single warehouse with its shelves
 export async function GET(
@@ -36,9 +36,27 @@ export async function GET(
       .from(shelves)
       .where(eq(shelves.warehouseId, id));
 
+    // Get item quantities summed by shelf for this warehouse
+    const itemCounts = await db
+      .select({ shelfId: items.shelfId, quantity: sum(items.quantity) })
+      .from(items)
+      .innerJoin(shelves, eq(items.shelfId, shelves.id))
+      .where(and(eq(shelves.warehouseId, id), eq(items.isContainer, false)))
+      .groupBy(items.shelfId);
+
+    const countsMap: Record<string, number> = {};
+    itemCounts.forEach((r: any) => {
+      countsMap[r.shelfId] = Number(r.quantity || 0);
+    });
+
+    const shelvesWithCounts = warehouseShelves.map((s) => ({
+      ...s,
+      _count: { inventoryItems: countsMap[s.id] || 0 },
+    }));
+
     return NextResponse.json({
       ...warehouse,
-      shelves: warehouseShelves,
+      shelves: shelvesWithCounts,
     });
   } catch (error) {
     console.error("Error fetching warehouse:", error);

@@ -106,10 +106,12 @@ export async function POST(request: Request) {
       .select({ quantity: items.quantity })
       .from(items)
       .innerJoin(shelves, eq(items.shelfId, shelves.id))
-      .where(eq(shelves.warehouseId, warehouseId));
+      .where(
+        and(eq(shelves.warehouseId, warehouseId), eq(items.isContainer, false)),
+      );
 
     const totalCurrentItems = allWarehouseItems.reduce(
-      (sum, item) => sum + (item.quantity || 1),
+      (sum, item) => sum + (item.quantity ?? 0),
       0,
     );
     const maxCapacity = CAPACITY_LIMITS.WAREHOUSE_DEFAULT;

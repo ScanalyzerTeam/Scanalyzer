@@ -125,7 +125,7 @@
     "dashboard": "Panel",
     "scanner": "Skaner",
     "warehouse": "Magazyn",
-    "aiAssistant": "Asystent AI",
+    "aiAssistant": "Scanalyzer",
     "ai-assistant": "Asystent AI",
     "profile": "Profil",
     "logout": "Wyloguj się"
@@ -155,7 +155,7 @@
     "signInButton": "Zaloguj się"
   },
   "aiAssistant": {
-    "logo": "AI Warehouse",
+    "logo": "Scanalyzer",
     "title": "Asystent AI",
     "subtitle": "Zapytaj mnie o magazyn",
     "placeholder": "Wpisz wiadomość...",
@@ -169,6 +169,7 @@
     "feature_analytics": "Analityka magazynu",
     "itemsScanned": "Przedmioty zeskanowane",
     "pendingRestock": "Oczekujące uzupełnienia",
+    "lowStockAlerts": "Alerty niskiego zapasu",
     "whyTitle": "Dlaczego Scanalyzer",
     "readyTitle": "Gotowy na modernizację magazynu?",
     "readyDesc": "Dołącz do Scanalyzer i zacznij zarządzać zapasami szybko, przejrzyście i z pomocą AI.",
@@ -180,6 +181,7 @@
     "aboutPara2": "Nasz system zawiera również zaawansowany skaner zdjęć, który pozwala szybko przechwytywać i katalogować przedmioty, co przyspiesza śledzenie zapasów.",
     "aboutPara3": "Niezależnie czy prowadzisz mały biznes czy duży magazyn, nasza platforma pomaga usprawnić operacje, poprawić dokładność i zaoszczędzić czas, zapewniając pełną widoczność zapasów.",
     "feature_smart_inventory": "Inteligentny inwentarz",
+    "feature_fast_scanning_desc": "Skanuj przedmioty w kilka sekund dzięki rozpoznawaniu zdjęć wspieranemu przez AI.",
     "feature_smart_inventory_desc": "Śledzenie i zarządzanie oparte na AI dla wszystkich przedmiotów w magazynie.",
     "feature_photo_scanner": "Skaner zdjęć",
     "feature_photo_scanner_desc": "Szybko przechwyć, kataloguj i śledź przedmioty za pomocą wbudowanego skanera zdjęć.",
@@ -199,7 +201,7 @@
     "whySubtitle": "Inteligentniejszy przepływ pracy dla każdego magazynu.",
     "whyDesc": "Stworzony, aby pomóc zespołom działać szybciej, zapobiegać brakowi towaru i utrzymywać półki zoptymalizowane przy mniejszej liczbie kliknięć. Przenieś procesy magazynowe do jednego eleganckiego panelu.",
     "workflow_scan_label": "Skanuj",
-    "workflow_scan_value": "Przechwyć przedmioty za pomocą zdjęcia i skanowania kodu kreskowego",
+    "workflow_scan_value": "Przechwyć przedmioty za pomocą zdjęcia",
     "workflow_organize_label": "Organizuj",
     "workflow_organize_value": "Grupuj przedmioty w półki i magazyny",
     "workflow_analyze_label": "Analizuj",
@@ -238,6 +240,9 @@
     "subtitle": "Zarządzaj swoimi danymi osobowymi",
     "personalInfo": "Dane osobowe",
     "editProfile": "Edytuj profil",
+    "fullName": "Pełne imię",
+    "emailAddress": "Adres e-mail",
+    "locationLabel": "Lokalizacja",
     "cancel": "Anuluj",
     "saveChanges": "Zapisz zmiany",
     "saving": "Zapisywanie...",
@@ -247,7 +252,11 @@
     "passwordTooShort": "Hasło musi mieć co najmniej 6 znaków",
     "passwordChanged": "Hasło zmienione pomyślnie!",
     "failedUpdate": "Nie udało się zaktualizować profilu",
-    "failedChangePassword": "Nie udało się zmienić hasła"
+    "failedChangePassword": "Nie udało się zmienić hasła",
+    "changePasswordTitle": "Zmień hasło",
+    "currentPassword": "Aktualne hasło",
+    "newPassword": "Nowe hasło",
+    "confirmNewPassword": "Potwierdź nowe hasło"
   },
   "ui": {
     "close": "Zamknij"

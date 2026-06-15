@@ -1,9 +1,7 @@
 "use client";
 
-import { Package, Trash2 } from "lucide-react";
+import { ChevronDown, Package, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-
-import { Button } from "@/components/ui/button";
 
 export interface SuggestedItem {
   name: string;
@@ -21,16 +19,15 @@ interface SuggestionsListProps {
 
 export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
   const t = useTranslations("suggestions");
+
   const updateItem = (index: number, updates: Partial<SuggestedItem>) => {
-    const next = items.map((item, i) =>
-      i === index ? { ...item, ...updates } : item,
+    onChange(
+      items.map((item, i) => (i === index ? { ...item, ...updates } : item)),
     );
-    onChange(next);
   };
 
   const removeItem = (index: number) => {
     const removed = items[index];
-    // If removing a container, clear containedIn for its children
     const next = items
       .filter((_, i) => i !== index)
       .map((item) =>
@@ -43,7 +40,7 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
 
   if (items.length === 0) {
     return (
-      <p className="py-4 text-center text-sm text-gray-500">{t("noItems")}</p>
+      <p className="py-8 text-center text-sm text-gray-400">{t("noItems")}</p>
     );
   }
 
@@ -51,7 +48,6 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
     .filter((item) => item.isContainer && item.included)
     .map((item) => item.name);
 
-  // Sort: containers first, then children grouped under their container
   const topLevel = items.filter((item) => !item.containedIn);
   const children = items.filter((item) => item.containedIn);
 
@@ -67,7 +63,6 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
       }
     }
   }
-  // Add any children whose parent wasn't found in topLevel
   for (const child of children) {
     if (!ordered.some((o) => o.item === child)) {
       ordered.push({ item: child, originalIndex: items.indexOf(child) });
@@ -75,91 +70,103 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {ordered.map(({ item, originalIndex }) => (
         <div
           key={originalIndex}
-          className={`rounded-lg border p-4 transition ${
+          className={`rounded-xl border transition-all ${
+            item.containedIn ? "ml-5 border-l-[3px] border-l-[#FFC107]/50" : ""
+          } ${
             item.included
-              ? "border-gray-200 bg-white"
-              : "border-gray-100 bg-gray-50 opacity-60"
-          } ${item.containedIn ? "ml-6 border-l-4 border-l-[#FFC107]/40" : ""}`}
+              ? "border-gray-200 bg-white shadow-sm"
+              : "border-gray-100 bg-gray-50/80 opacity-55"
+          }`}
         >
-          <div className="mb-3 flex items-start justify-between">
-            <div className="flex items-center gap-2">
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={item.included}
-                  onChange={(e) =>
-                    updateItem(originalIndex, { included: e.target.checked })
-                  }
-                  className="accent-[#FFC107]"
-                />
-                <span className="font-medium text-gray-700">
-                  {t("include")}
-                </span>
-              </label>
-              {item.containedIn && (
-                <span className="rounded-full bg-[#FFF9E6] px-2 py-0.5 text-xs font-medium text-[#B8860B]">
-                  {t("insideLabel")} {item.containedIn}
-                </span>
-              )}
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => removeItem(originalIndex)}
-              className="h-7 w-7 p-0 text-gray-400 hover:text-red-500"
+          {/* Top bar */}
+          <div className="flex items-center gap-3 border-b border-gray-100 px-4 py-3">
+            {/* Toggle switch */}
+            <button
+              type="button"
+              role="switch"
+              aria-checked={item.included}
+              onClick={() =>
+                updateItem(originalIndex, { included: !item.included })
+              }
+              className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none ${
+                item.included ? "bg-[#FFC107]" : "bg-gray-200"
+              }`}
             >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+              <span
+                className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                  item.included ? "translate-x-4" : "translate-x-0"
+                }`}
+              />
+            </button>
+
+            <span className="text-xs font-medium tracking-wide text-gray-500 uppercase">
+              {t("include")}
+            </span>
+
+            {item.containedIn && (
+              <span className="ml-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
+                ↳ {item.containedIn}
+              </span>
+            )}
+
+            {item.isContainer && (
+              <span className="flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">
+                <Package className="h-3 w-3" />
+                {t("container")}
+              </span>
+            )}
+
+            <button
+              type="button"
+              onClick={() => removeItem(originalIndex)}
+              className="ml-auto rounded-lg p-1.5 text-gray-300 transition-colors hover:bg-red-50 hover:text-red-400"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor={`item-name-${originalIndex}`}
-                className="mb-1 block text-xs font-medium text-gray-500"
-              >
+          {/* Fields */}
+          <div className="grid grid-cols-12 gap-3 px-4 py-3">
+            {/* Name */}
+            <div className="col-span-12 sm:col-span-4">
+              <label className="mb-1 block text-xs font-medium text-gray-400">
                 {t("name")}
               </label>
               <input
-                id={`item-name-${originalIndex}`}
                 type="text"
                 value={item.name}
                 onChange={(e) =>
                   updateItem(originalIndex, { name: e.target.value })
                 }
-                className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm text-black focus:border-[#FFC107] focus:outline-none"
+                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 transition focus:border-[#FFC107] focus:bg-white focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
               />
             </div>
-            <div>
-              <label
-                htmlFor={`item-desc-${originalIndex}`}
-                className="mb-1 block text-xs font-medium text-gray-500"
-              >
+
+            {/* Description */}
+            <div className="col-span-12 sm:col-span-5">
+              <label className="mb-1 block text-xs font-medium text-gray-400">
                 {t("description")}
               </label>
               <input
-                id={`item-desc-${originalIndex}`}
                 type="text"
                 value={item.description}
                 onChange={(e) =>
                   updateItem(originalIndex, { description: e.target.value })
                 }
-                className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm text-black focus:border-[#FFC107] focus:outline-none"
+                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 transition focus:border-[#FFC107] focus:bg-white focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
               />
             </div>
-            <div>
-              <label
-                htmlFor={`item-qty-${originalIndex}`}
-                className="mb-1 block text-xs font-medium text-gray-500"
-              >
+
+            {/* Quantity */}
+            <div className="col-span-6 sm:col-span-2">
+              <label className="mb-1 block text-xs font-medium text-gray-400">
                 {t("quantity")}
               </label>
               <input
-                id={`item-qty-${originalIndex}`}
                 type="number"
                 min={1}
                 value={item.quantity}
@@ -168,50 +175,45 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
                     quantity: Math.max(1, parseInt(e.target.value) || 1),
                   })
                 }
-                className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm text-black focus:border-[#FFC107] focus:outline-none"
+                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 transition focus:border-[#FFC107] focus:bg-white focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
               />
             </div>
-            <div className="flex items-end gap-4">
-              <label className="flex items-center gap-2 pb-1.5 text-sm text-gray-700">
-                <input
-                  type="checkbox"
-                  checked={item.isContainer}
-                  onChange={(e) =>
-                    updateItem(originalIndex, { isContainer: e.target.checked })
+
+            {/* Container toggle */}
+            <div className="col-span-6 flex items-end pb-0.5 sm:col-span-1">
+              <label className="flex cursor-pointer flex-col items-center gap-1">
+                <span className="text-xs font-medium text-gray-400">
+                  {t("container")}
+                </span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={item.isContainer}
+                  onClick={() =>
+                    updateItem(originalIndex, {
+                      isContainer: !item.isContainer,
+                    })
                   }
-                  className="accent-[#FFC107]"
-                />
-                <Package className="h-4 w-4" />
-                {t("container")}
+                  className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-colors ${
+                    item.isContainer ? "bg-[#FFC107]" : "bg-gray-200"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                      item.isContainer ? "translate-x-4" : "translate-x-0"
+                    }`}
+                  />
+                </button>
               </label>
             </div>
-            <div className="sm:col-span-2">
-              <label
-                htmlFor={`item-parent-${originalIndex}`}
-                className="mb-1 block text-xs font-medium text-gray-500"
-              >
-                {t("insideContainer")}
-              </label>
-              <select
-                id={`item-parent-${originalIndex}`}
-                value={item.containedIn ?? ""}
-                onChange={(e) =>
-                  updateItem(originalIndex, {
-                    containedIn: e.target.value || null,
-                  })
-                }
-                className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm text-black focus:border-[#FFC107] focus:outline-none"
-              >
-                <option value="">{t("noneTop")}</option>
-                {containerNames
-                  .filter((name) => name !== item.name)
-                  .map((name) => (
-                    <option key={name} value={name}>
-                      {name}
-                    </option>
-                  ))}
-              </select>
-            </div>
+
+            {/* Inside container */}
+            {containerNames.length > 0 && (
+              <div className="relative col-span-12">
+                <label className="mb-1 block text-xs font-medium text-gray-400"></label>
+                <div className="relative"></div>
+              </div>
+            )}
           </div>
         </div>
       ))}

@@ -38,7 +38,7 @@ type WarehouseCapacity = {
 };
 
 export function calculateShelfItemCount(shelfItems: ShelfItem[]): number {
-  return shelfItems.reduce((total, item) => total + (item.quantity || 1), 0);
+  return shelfItems.reduce((total, item) => total + (item.quantity ?? 0), 0);
 }
 
 export function getShelfCapacity(
