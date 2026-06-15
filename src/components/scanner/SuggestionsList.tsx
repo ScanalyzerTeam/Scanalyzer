@@ -129,14 +129,15 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
             </button>
           </div>
 
-          {/* Fields */}
+         {/* Fields */}
           <div className="grid grid-cols-12 gap-3 px-4 py-3">
             {/* Name */}
             <div className="col-span-12 sm:col-span-4">
-              <label className="mb-1 block text-xs font-medium text-gray-400">
+              <label className="mb-1 block text-xs font-medium text-gray-400" htmlFor={`name-${originalIndex}`}>
                 {t("name")}
               </label>
               <input
+                id={`name-${originalIndex}`}
                 type="text"
                 value={item.name}
                 onChange={(e) =>
@@ -145,13 +146,13 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
                 className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 transition focus:border-[#FFC107] focus:bg-white focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
               />
             </div>
-
             {/* Description */}
             <div className="col-span-12 sm:col-span-5">
-              <label className="mb-1 block text-xs font-medium text-gray-400">
+              <label className="mb-1 block text-xs font-medium text-gray-400" htmlFor={`description-${originalIndex}`}>
                 {t("description")}
               </label>
               <input
+                id={`description-${originalIndex}`}
                 type="text"
                 value={item.description}
                 onChange={(e) =>
@@ -160,13 +161,13 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
                 className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 transition focus:border-[#FFC107] focus:bg-white focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
               />
             </div>
-
             {/* Quantity */}
             <div className="col-span-6 sm:col-span-2">
-              <label className="mb-1 block text-xs font-medium text-gray-400">
+              <label className="mb-1 block text-xs font-medium text-gray-400" htmlFor={`quantity-${originalIndex}`}>
                 {t("quantity")}
               </label>
               <input
+                id={`quantity-${originalIndex}`}
                 type="number"
                 min={1}
                 value={item.quantity}
@@ -178,7 +179,6 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
                 className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 transition focus:border-[#FFC107] focus:bg-white focus:ring-2 focus:ring-[#FFC107]/20 focus:outline-none"
               />
             </div>
-
             {/* Container toggle */}
             <div className="col-span-6 flex items-end pb-0.5 sm:col-span-1">
               <div className="flex cursor-pointer flex-col items-center gap-1">
@@ -207,11 +207,9 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
                 </button>
               </div>
             </div>
-
             {/* Inside container */}
             {containerNames.length > 0 && (
               <div className="relative col-span-12">
-                <label className="mb-1 block text-xs font-medium text-gray-400"></label>
                 <div className="relative"></div>
               </div>
             )}
