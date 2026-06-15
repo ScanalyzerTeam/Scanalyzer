@@ -45,9 +45,9 @@ export async function GET(
       .groupBy(items.shelfId);
 
     const countsMap: Record<string, number> = {};
-   itemCounts.forEach((r) => {
-  countsMap[r.shelfId as string] = Number(r.quantity || 0);
-});
+    itemCounts.forEach((r) => {
+      countsMap[r.shelfId as string] = Number(r.quantity || 0);
+    });
 
     const shelvesWithCounts = warehouseShelves.map((s) => ({
       ...s,

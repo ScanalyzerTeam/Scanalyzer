@@ -129,11 +129,14 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
             </button>
           </div>
 
-         {/* Fields */}
+          {/* Fields */}
           <div className="grid grid-cols-12 gap-3 px-4 py-3">
             {/* Name */}
             <div className="col-span-12 sm:col-span-4">
-              <label className="mb-1 block text-xs font-medium text-gray-400" htmlFor={`name-${originalIndex}`}>
+              <label
+                className="mb-1 block text-xs font-medium text-gray-400"
+                htmlFor={`name-${originalIndex}`}
+              >
                 {t("name")}
               </label>
               <input
@@ -148,7 +151,10 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
             </div>
             {/* Description */}
             <div className="col-span-12 sm:col-span-5">
-              <label className="mb-1 block text-xs font-medium text-gray-400" htmlFor={`description-${originalIndex}`}>
+              <label
+                className="mb-1 block text-xs font-medium text-gray-400"
+                htmlFor={`description-${originalIndex}`}
+              >
                 {t("description")}
               </label>
               <input
@@ -163,7 +169,10 @@ export function SuggestionsList({ items, onChange }: SuggestionsListProps) {
             </div>
             {/* Quantity */}
             <div className="col-span-6 sm:col-span-2">
-              <label className="mb-1 block text-xs font-medium text-gray-400" htmlFor={`quantity-${originalIndex}`}>
+              <label
+                className="mb-1 block text-xs font-medium text-gray-400"
+                htmlFor={`quantity-${originalIndex}`}
+              >
                 {t("quantity")}
               </label>
               <input
