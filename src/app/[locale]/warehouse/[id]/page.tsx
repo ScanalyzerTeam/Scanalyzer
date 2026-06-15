@@ -155,7 +155,7 @@ const WarehouseMapPage = () => {
   );
   const totalItems =
     warehouse?.shelves.reduce(
-      (sum, s) => sum + ((s as any)._count?.inventoryItems ?? 0),
+      (sum, s) => sum + ((s as { _count?: { inventoryItems?: number } })._count?.inventoryItems ?? 0),
       0,
     ) ?? 0;
 
